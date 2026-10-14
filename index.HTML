@@ -129,6 +129,10 @@
           <i data-lucide="pie-chart" class="w-4 h-4 text-[#344966]"></i>
           <span>Values Compass</span>
         </button>
+        <button id="nav-game" onclick="switchView('game')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
+          <i data-lucide="plane" class="w-4 h-4 text-[#C85A32]"></i>
+          <span>Travel Game</span>
+        </button>
       </nav>
 
       <!-- Action buttons -->
@@ -308,6 +312,13 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- VIEW 4: TRAVEL GAME -->
+    <section id="view-game" class="space-y-6 hidden h-full">
+      <div class="paper-card w-full h-[700px] overflow-hidden rounded-xl border border-[#E5DBC9]">
+         <iframe src="game.html" class="w-full h-full border-none" title="Travel Game"></iframe>
       </div>
     </section>
 
@@ -536,7 +547,7 @@
 
     // Navigation Switcher
     function switchView(viewName) {
-      document.querySelectorAll('#view-map, #view-journal, #view-compass').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('#view-map, #view-journal, #view-compass, #view-game').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
         btn.classList.add('text-[#6B5E52]');
