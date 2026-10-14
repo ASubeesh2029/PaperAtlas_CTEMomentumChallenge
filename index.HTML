@@ -3,35 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paper Atlas Career Map - Humanized Edition</title>
+  <title>Paper Atlas Career Map</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   
   <style>
     :root {
-      --paper-cream: #FAF6EE;
-      --paper-card: #FFFDF9;
-      --paper-border: #E5DBC9;
-      --ink-dark: #2D2621;
-      --ink-muted: #6B5E52;
-      --terracotta: #C85A32;
-      --sage: #5F7A63;
-      --indigo-map: #344966;
-      --amber-warm: #D98A2B;
+      --isabelline: #F6EEEB;
+      --white: #FFFFFF;
+      --warm-sand: #EADFC8;
+      --light-taupe: #D9CFC4;
+      --dark-sand: #CDBF9F;
+      --deep-charcoal: #3B3430;
+      --muted-brown-gray: #6B625C;
+      --placeholder-gray: #7A706A;
+      --teal: #457F7D;
     }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--paper-cream);
-      color: var(--ink-dark);
-      background-image: 
-        radial-gradient(rgba(180, 160, 135, 0.15) 1px, transparent 1px),
-        linear-gradient(to right, rgba(180, 160, 135, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(180, 160, 135, 0.04) 1px, transparent 1px);
-      background-size: 20px 20px, 40px 40px, 40px 40px;
+      background-color: var(--isabelline);
+      color: var(--deep-charcoal);
+      border: 6px solid var(--light-taupe);
+      min-height: 100vh;
     }
 
     .font-handwritten {
@@ -42,40 +42,70 @@
       font-family: 'Playfair Display', serif;
     }
 
-    /* Hand-drawn paper styling effects */
+    /* Card & Container styling using Warm Sand and Deep Charcoal borders */
     .paper-card {
-      background: var(--paper-card);
-      border: 2px solid var(--paper-border);
-      box-shadow: 3px 4px 0px rgba(85, 70, 55, 0.08);
+      background: var(--warm-sand);
+      border: 2px solid var(--deep-charcoal);
+      box-shadow: 3px 4px 0px rgba(59, 52, 48, 0.15);
       border-radius: 12px;
       transition: all 0.25s ease;
     }
 
     .paper-card:hover {
       transform: translateY(-2px);
-      box-shadow: 5px 8px 0px rgba(85, 70, 55, 0.12);
+      box-shadow: 5px 7px 0px rgba(59, 52, 48, 0.2);
     }
 
     .stamp-badge {
       display: inline-block;
       padding: 4px 12px;
-      border: 2px dashed currentColor;
+      border: 2px dashed var(--deep-charcoal);
       border-radius: 6px;
       font-family: 'Caveat', cursive;
       font-weight: 700;
       transform: rotate(-2deg);
+      background-color: var(--white);
+      color: var(--deep-charcoal);
     }
 
-    /* Sketchy organic SVG path animation */
-    .map-path-line {
+    /* Roads and path styling on map */
+    .map-road-line {
+      stroke: var(--isabelline);
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+
+    .map-path-teal {
+      stroke: var(--teal);
+      stroke-width: 4;
       stroke-dasharray: 8 6;
       animation: dash 30s linear infinite;
     }
 
     @keyframes dash {
-      to {
-        stroke-dashoffset: -100;
-      }
+      to { stroke-dashoffset: -100; }
+    }
+
+    /* Start point dot custom style */
+    .start-point-dot {
+      width: 16px;
+      height: 16px;
+      background-color: var(--white);
+      border: 3px solid var(--teal);
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 2px var(--deep-charcoal);
+    }
+
+    /* Placeholder text styling across form elements */
+    ::placeholder {
+      color: var(--placeholder-gray) !important;
+      opacity: 1;
+    }
+
+    /* Custom Leaflet map background override to match Isabelline roads */
+    .leaflet-container {
+      background-color: #e3d9d3 !important;
     }
 
     /* Custom Scrollbar */
@@ -83,66 +113,70 @@
       width: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #F0E8DA;
+      background: var(--isabelline);
     }
     ::-webkit-scrollbar-thumb {
-      background: #CDBEAA;
+      background: var(--dark-sand);
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #A89882;
+      background: var(--muted-brown-gray);
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-900">
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#457F7D] selection:text-white">
 
-  <!-- Navigation / Header -->
-  <header class="border-b-2 border-[#E5DBC9] bg-[#FAF6EE]/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3">
+  <header class="border-b-2 border-[#3B3430] bg-[#457F7D] sticky top-0 z-40 px-4 lg:px-8 py-3 text-[#F6EEEB] shadow-md">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
       
+      <!-- Left corner (Logo, Text, Living Map Bubble kept identical in structure) -->
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-[#C85A32]/10 border-2 border-[#C85A32] flex items-center justify-center text-[#C85A32]">
-          <i data-lucide="compass" class="w-6 h-6 animate-spin-slow"></i>
+        <div class="w-10 h-10 rounded-full bg-[#FFFFFF] border-2 border-[#3B3430] flex items-center justify-center text-[#3B3430] overflow-hidden shadow-sm">
+          <img src="logo1.png" alt="Atlas Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/3B3430/F6EEEB?text=Logo';">
         </div>
         <div>
-          <h1 class="font-serif-journal text-2xl font-bold text-[#2D2621] flex items-center gap-2">
+          <h1 class="font-serif-journal text-2xl font-bold text-[#F6EEEB] flex items-center gap-2">
             My Human Career Atlas
-            <span class="text-xs font-handwritten text-[#C85A32] border border-[#C85A32] px-2 py-0.5 rounded-full rotate-2">
+            <span class="text-xs font-handwritten text-[#3B3430] bg-[#FFFFFF] border border-[#3B3430] px-2 py-0.5 rounded-full rotate-2 shadow-sm">
               Living Map
             </span>
           </h1>
-          <p class="text-xs text-[#6B5E52]">A personal landscape of stories, detours, growth, and compass points</p>
+          <p class="text-xs text-[#F6EEEB]/90">A personal landscape of stories, detours, growth, and compass points</p>
         </div>
       </div>
 
-      <!-- Navigation tabs -->
-      <nav class="flex items-center space-x-1 sm:space-x-2 bg-[#EFE6D5] p-1 rounded-xl text-sm font-medium">
-        <button id="nav-map" onclick="switchView('map')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 transition bg-[#FFFDF9] text-[#2D2621] shadow-sm">
-          <i data-lucide="map" class="w-4 h-4 text-[#C85A32]"></i>
+      <!-- Navigation tabs with Isabelline top bar text -->
+      <nav class="flex items-center space-x-1 sm:space-x-2 bg-[#3B3430]/20 p-1.5 rounded-xl text-sm font-medium border border-[#3B3430]/30">
+        <button id="nav-map" onclick="switchView('map')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 transition bg-[#FFFFFF] text-[#3B3430] border border-[#3B3430] font-bold shadow-sm">
+          <i data-lucide="map" class="w-4 h-4 text-[#457F7D]"></i>
           <span>Visual Atlas</span>
         </button>
-        <button id="nav-journal" onclick="switchView('journal')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
-          <i data-lucide="book-open" class="w-4 h-4 text-[#5F7A63]"></i>
+        <button id="nav-ai" onclick="switchView('ai')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#FFFFFF]/10 transition">
+          <i data-lucide="bot" class="w-4 h-4 text-[#F6EEEB]"></i>
+          <span>AI Assistant</span>
+        </button>
+        <button id="nav-journal" onclick="switchView('journal')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#FFFFFF]/10 transition">
+          <i data-lucide="book-open" class="w-4 h-4 text-[#F6EEEB]"></i>
           <span>Field Journal</span>
         </button>
-        <button id="nav-compass" onclick="switchView('compass')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
-          <i data-lucide="pie-chart" class="w-4 h-4 text-[#344966]"></i>
+        <button id="nav-compass" onclick="switchView('compass')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#FFFFFF]/10 transition">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-[#F6EEEB]"></i>
           <span>Values Compass</span>
         </button>
-        <button id="nav-game" onclick="switchView('game')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
-          <i data-lucide="plane" class="w-4 h-4 text-[#C85A32]"></i>
+        <button id="nav-game" onclick="switchView('game')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#FFFFFF]/10 transition">
+          <i data-lucide="plane" class="w-4 h-4 text-[#F6EEEB]"></i>
           <span>Travel Game</span>
         </button>
       </nav>
 
       <!-- Action buttons -->
       <div class="flex items-center space-x-2">
-        <button onclick="toggleAudio()" id="audio-btn" class="paper-card px-3 py-1.5 text-xs font-medium text-[#6B5E52] hover:text-[#2D2621] flex items-center space-x-1.5">
-          <i data-lucide="volume-x" id="audio-icon" class="w-4 h-4"></i>
+        <button onclick="toggleAudio()" id="audio-btn" class="bg-[#FFFFFF] text-[#3B3430] border border-[#3B3430] px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-[#F6EEEB] flex items-center space-x-1.5 shadow-sm transition">
+          <i data-lucide="volume-x" id="audio-icon" class="w-4 h-4 text-[#3B3430]"></i>
           <span id="audio-text">Cozy Ambience</span>
         </button>
-        <button onclick="openAddModal()" class="bg-[#C85A32] hover:bg-[#b04d28] text-white px-4 py-1.5 rounded-xl text-sm font-medium shadow-md transition flex items-center space-x-2">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        <button onclick="openAddModal()" class="bg-[#3B3430] hover:bg-[#2A2522] text-[#F6EEEB] border border-[#3B3430] px-4 py-1.5 rounded-xl text-sm font-medium shadow-md transition flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-4 h-4 text-[#457F7D]"></i>
           <span>Add Waypoint</span>
         </button>
       </div>
@@ -150,89 +184,241 @@
     </div>
   </header>
 
-  <!-- Main Content Area -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
 
     <!-- Filter Bar & Mood Banner -->
     <section class="paper-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-3 w-full md:w-auto">
-        <span class="text-xs font-bold text-[#6B5E52] uppercase tracking-wider">Filter Chapters:</span>
+        <span class="text-xs font-bold text-[#3B3430] uppercase tracking-wider">Filter Chapters:</span>
         <div class="flex flex-wrap gap-1.5" id="category-filters">
-          <!-- Filled dynamically -->
+          <!-- Filled dynamically with white filter chips with charcoal outlines -->
         </div>
       </div>
-      <div class="flex items-center space-x-3 text-xs text-[#6B5E52]">
-        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#5F7A63]"></span> High Fulfillment</span>
-        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#D98A2B]"></span> Learning Detour</span>
-        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#C85A32]"></span> Courageous Leap</span>
+      <div class="flex items-center space-x-3 text-xs text-[#6B625C]">
+        <span class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-[#457F7D] border border-[#3B3430]"></span> High Fulfillment
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-[#EADFC8] border border-[#3B3430]"></span> Learning Detour
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-[#3B3430] border border-[#3B3430]"></span> Courageous Leap
+        </span>
       </div>
     </section>
 
     <!-- VIEW 1: MAP VIEW -->
     <section id="view-map" class="space-y-6">
-      <div class="paper-card relative min-h-[580px] p-6 lg:p-10 overflow-hidden bg-[#FAF4E8]">
+      
+      <!-- Topography Canvas Map -->
+      <div class="paper-card relative min-h-[580px] p-6 lg:p-10 overflow-hidden bg-[#EADFC8]">
         
-        <!-- Topographical background details -->
-        <div class="absolute inset-0 opacity-10 pointer-events-none">
-          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,100 Q 200,40 400,120 T 800,80 T 1200,150" fill="none" stroke="#6B5E52" stroke-width="2"/>
-            <path d="M0,250 Q 300,180 600,280 T 1200,200" fill="none" stroke="#6B5E52" stroke-width="2"/>
-            <path d="M0,450 Q 250,380 500,480 T 1000,420" fill="none" stroke="#6B5E52" stroke-width="2"/>
-          </svg>
-        </div>
-
-        <!-- Compass Rose Decoration -->
-        <div class="absolute top-6 right-6 opacity-25 hidden sm:block pointer-events-none">
-          <svg class="w-28 h-28" viewBox="0 0 100 100" fill="none" stroke="#2D2621">
-            <circle cx="50" cy="50" r="45" stroke-width="1" stroke-dasharray="2 2"/>
-            <path d="M50 5 L50 95 M5 L50 L95 50" stroke-width="1.5"/>
-            <path d="M50 15 L58 42 L85 50 L58 58 L50 85 L42 58 L15 50 L42 42 Z" fill="#344966" opacity="0.3"/>
-            <text x="47" y="12" class="text-[8px] font-bold">N</text>
-            <text x="47" y="96" class="text-[8px] font-bold">S</text>
-          </svg>
-        </div>
-
-        <!-- Map Title Banner -->
-        <div class="mb-6 flex justify-between items-start">
+        <!-- Map Title & Zoom Controls -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 class="font-serif-journal text-xl font-bold text-[#2D2621]">The Topography of My Journey</h2>
-            <p class="text-sm text-[#6B5E52]">Click any waypoint island to unearth the human stories, stumbles, and lessons behind it.</p>
+            <h2 class="font-serif-journal text-2xl font-bold text-[#3B3430]">The Topography of My Journey</h2>
+            <p class="text-sm text-[#6B625C]">Click any waypoint island to unearth the human stories, stumbles, and lessons behind it.</p>
           </div>
-          <div class="font-handwritten text-lg text-[#C85A32] flex items-center gap-1">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>"Not all who wander are lost"</span>
+          
+          <div class="flex items-center space-x-2">
+            <!-- Map Legend (White) -->
+            <div class="bg-[#FFFFFF] border-2 border-[#3B3430] px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 font-medium shadow-sm">
+              <span class="w-3 h-3 rounded-full bg-[#FFFFFF] border-2 border-[#3B3430]"></span>
+              <span class="text-[#3B3430]">Legend: Route & Waypoints</span>
+            </div>
+            
+            <!-- Zoom Buttons (White with Charcoal Outlines) -->
+            <div class="flex rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] overflow-hidden shadow-sm">
+              <button onclick="zoomMap(1.1)" class="px-2.5 py-1 text-[#3B3430] hover:bg-[#F6EEEB] border-r border-[#3B3430]" title="Zoom In">+</button>
+              <button onclick="zoomMap(0.9)" class="px-2.5 py-1 text-[#3B3430] hover:bg-[#F6EEEB]" title="Zoom Out">-</button>
+            </div>
           </div>
         </div>
 
-        <!-- SVG Map Container for Connecting Bezier Curve -->
-        <div class="relative w-full h-[420px]" id="map-canvas-container">
+        <!-- SVG Canvas Area with Isabelline Road Base and Teal Active Path -->
+        <div class="relative w-full h-[420px] rounded-xl border-2 border-[#3B3430] bg-[#EADFC8] overflow-hidden shadow-inner" id="map-canvas-container">
           <svg class="absolute inset-0 w-full h-full pointer-events-none" id="map-svg-lines">
-            <path id="bezier-path" d="" fill="none" stroke="#C85A32" stroke-width="3" stroke-linecap="round" class="map-path-line opacity-75"/>
+            <!-- Isabelline Road Base -->
+            <path id="road-path" d="" class="map-road-line" />
+            <!-- Teal Active Route Line -->
+            <path id="bezier-path" d="" fill="none" class="map-path-teal" />
           </svg>
 
           <!-- Dynamic Nodes rendered by JavaScript -->
-          <div id="map-nodes-container" class="relative w-full h-full"></div>
+          <div id="map-nodes-container" class="relative w-full h-full z-10"></div>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-[#E5DBC9] flex flex-wrap items-center justify-between text-xs text-[#6B5E52] gap-2">
+        <div class="mt-4 pt-4 border-t-2 border-[#CDBF9F] flex flex-wrap items-center justify-between text-xs text-[#6B625C] gap-2">
           <div class="flex items-center space-x-2">
-            <i data-lucide="info" class="w-4 h-4 text-[#344966]"></i>
+            <i data-lucide="info" class="w-4 h-4 text-[#457F7D]"></i>
             <span>Waypoints reflect emotional states, key mentors, and pivotal life turns rather than just job titles.</span>
           </div>
-          <div class="font-handwritten text-base text-[#2D2621]">
-            Current Chapter: <span class="font-bold text-[#C85A32]" id="current-chapter-name">Loading...</span>
+          <div class="font-handwritten text-base text-[#3B3430]">
+            Current Chapter: <span class="font-bold text-[#457F7D]" id="current-chapter-name">Loading...</span>
           </div>
+        </div>
+
+      </div>
+
+      <!-- INTERACTIVE LEAFLET MAP (Morris County Map) -->
+      <div class="paper-card p-6 flex flex-col h-[520px] relative">
+        <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="font-serif-journal text-xl font-bold text-[#3B3430]">Morris County Map</h2>
+            <p class="text-sm text-[#6B625C]">High-density populated towns in Morris County, NJ.</p>
+          </div>
+          
+          <!-- Search Bar (White background, gray-brown placeholder, charcoal border) -->
+          <div class="relative w-full sm:w-72">
+            <input type="text" id="map-search" placeholder="Search towns in Morris County..." class="w-full pl-9 pr-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] focus:outline-none focus:ring-2 focus:ring-[#457F7D] text-sm text-[#3B3430] placeholder-[#7A706A] shadow-sm">
+            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#7A706A]"></i>
+          </div>
+        </div>
+        
+        <div id="leaflet-map-container" class="flex-1 w-full rounded-xl border-2 border-[#3B3430] z-10 relative overflow-hidden shadow-sm"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: AI ASSISTANT & TRANSPORTATION ROUTE EXPLORER -->
+    <section id="view-ai" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: AI Assistant Chat Interface -->
+        <div class="paper-card p-6 space-y-4 lg:col-span-1 flex flex-col justify-between min-h-[500px]">
+          <div>
+            <div class="flex justify-between items-center border-b-2 border-[#CDBF9F] pb-3 mb-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-[#457F7D] text-[#FFFFFF] flex items-center justify-center font-bold">
+                  <i data-lucide="bot" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="font-serif-journal text-lg font-bold text-[#3B3430]">Career AI Navigator</h3>
+                  <p class="text-[11px] text-[#6B625C]">Ask questions about paths & skill matches</p>
+                </div>
+              </div>
+              <span class="text-[10px] text-[#6B625C] bg-[#FFFFFF] border border-[#3B3430] px-2 py-0.5 rounded-full font-medium">
+                least experience first
+              </span>
+            </div>
+
+            <!-- Chat History Panel -->
+            <div id="chat-messages" class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+              <div class="p-3 rounded-xl bg-[#FFFFFF] border border-[#3B3430] text-xs text-[#3B3430] shadow-sm">
+                <p class="font-bold text-[#457F7D] mb-1">Atlas AI Advisor:</p>
+                <p>Hello! I can guide you through career routes, skill jumps, or transport connections between towns. What would you like to explore?</p>
+              </div>
+
+              <!-- User Chat Bubble (White) -->
+              <div class="p-3 rounded-xl bg-[#FFFFFF] border-2 border-[#3B3430] text-xs text-[#3B3430] ml-4 shadow-sm">
+                <p class="font-bold text-[#3B3430] mb-0.5 text-right">You:</p>
+                <p class="text-right">What's the best route for transitioning from Junior apprentice to Design Lead?</p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-[#FFFFFF] border border-[#3B3430] text-xs text-[#3B3430] shadow-sm">
+                <p class="font-bold text-[#457F7D] mb-1">Atlas AI Advisor:</p>
+                <p>I recommend building creative mastery first, then moving into strategy before aiming for leadership!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Box (White background, gray-brown placeholder, charcoal border) -->
+          <div class="pt-2 border-t-2 border-[#CDBF9F] flex gap-2">
+            <input type="text" id="ai-chat-input" placeholder="Type a career question..." class="flex-1 px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-xs text-[#3B3430] placeholder-[#7A706A] focus:outline-none focus:ring-1 focus:ring-[#457F7D]">
+            <button onclick="sendChatMessage()" class="bg-[#457F7D] text-[#FFFFFF] px-3 py-2 rounded-lg text-xs font-bold border border-[#3B3430] hover:bg-[#386765] transition">
+              Send
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Route Explorer & Match Cards -->
+        <div class="paper-card p-6 space-y-5 lg:col-span-2">
+          <div class="flex justify-between items-start border-b-2 border-[#CDBF9F] pb-3">
+            <div>
+              <h3 class="font-serif-journal text-xl font-bold text-[#3B3430]">Route & Transportation Planner</h3>
+              <p class="text-xs text-[#6B625C]">Plan physical & skill routes between Morristown & Parsippany</p>
+            </div>
+            <span class="stamp-badge border-[#3B3430] text-[#3B3430]">Transit Navigator</span>
+          </div>
+
+          <!-- Transportation Controls: "From" Box & Options -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-[#3B3430] flex items-center gap-1">
+                <span class="start-point-dot"></span> "From" Box
+              </label>
+              <input type="text" value="Morristown Station" placeholder="From starting point..." class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-xs text-[#3B3430] placeholder-[#7A706A]">
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-[#3B3430] flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-4 h-4 text-[#457F7D]"></i> "To" Destination
+              </label>
+              <input type="text" value="Parsippany Tech Center" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-xs text-[#3B3430] placeholder-[#7A706A]">
+            </div>
+          </div>
+
+          <!-- Selected Route Card (White) -->
+          <div class="p-4 rounded-xl bg-[#FFFFFF] border-2 border-[#3B3430] space-y-3 shadow-sm">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center space-x-2">
+                <span class="start-point-dot"></span>
+                <span class="text-xs font-bold text-[#3B3430]">Selected Route: NJ-10 N Express</span>
+              </div>
+              <span class="text-[11px] font-bold text-[#FFFFFF] bg-[#457F7D] px-2 py-0.5 rounded border border-[#3B3430]">Fastest Match</span>
+            </div>
+            
+            <p class="text-xs text-[#6B625C]">Direct highway corridor linking Morristown downtown directly with Parsippany commercial hubs.</p>
+            
+            <div class="pt-2 border-t border-[#CDBF9F] flex items-center justify-between">
+              <span class="text-xs text-[#6B625C]">Distance: 12.4 miles | Est. Time: 18 mins</span>
+              <div class="flex gap-2">
+                <button onclick="switchView('map')" class="bg-[#457F7D] hover:bg-[#386765] text-[#FFFFFF] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#3B3430] transition">
+                  Show on map
+                </button>
+                <button onclick="openDetailModal('wp-4')" class="bg-[#457F7D] hover:bg-[#386765] text-[#FFFFFF] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#3B3430] transition">
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Cards Grid (Warm Sand) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-3.5 rounded-xl bg-[#EADFC8] border-2 border-[#3B3430] space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-[#3B3430]">Scenic Commute Option</span>
+                <span class="text-[10px] text-[#6B625C] font-semibold">Experience Level: Mid</span>
+              </div>
+              <p class="text-xs text-[#6B625C]">Via Route 202 through Hanover Township.</p>
+              <div class="pt-2 border-t border-[#CDBF9F] flex justify-between items-center">
+                <span class="text-[11px] font-bold text-[#3B3430]">24 mins</span>
+                <button onclick="switchView('map')" class="text-[#457F7D] text-xs font-bold hover:underline">Show on map</button>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-[#EADFC8] border-2 border-[#3B3430] space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-[#3B3430]">Train & Shuttle Link</span>
+                <span class="text-[10px] text-[#6B625C] font-semibold">Least experience first</span>
+              </div>
+              <p class="text-xs text-[#6B625C]">NJ Transit Morris & Essex Line transit route.</p>
+              <div class="pt-2 border-t border-[#CDBF9F] flex justify-between items-center">
+                <span class="text-[11px] font-bold text-[#3B3430]">32 mins</span>
+                <button onclick="openDetailModal('wp-1')" class="text-[#457F7D] text-xs font-bold hover:underline">Details</button>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
     </section>
 
-    <!-- VIEW 2: FIELD JOURNAL STORIES -->
+    <!-- VIEW 3: FIELD JOURNAL STORIES -->
     <section id="view-journal" class="space-y-6 hidden">
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="font-serif-journal text-2xl font-bold text-[#2D2621]">Field Journal Entries</h2>
-          <p class="text-sm text-[#6B5E52]">Honest notes on what was happening behind the resume lines.</p>
+          <h2 class="font-serif-journal text-2xl font-bold text-[#3B3430]">Field Journal Entries</h2>
+          <p class="text-sm text-[#6B625C]">Honest notes on what was happening behind the resume lines.</p>
         </div>
       </div>
 
@@ -241,18 +427,18 @@
       </div>
     </section>
 
-    <!-- VIEW 3: VALUES COMPASS -->
+    <!-- VIEW 4: VALUES COMPASS -->
     <section id="view-compass" class="space-y-6 hidden">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Radar Alignment Card -->
         <div class="paper-card p-6 lg:col-span-2 space-y-4">
-          <div class="flex justify-between items-start">
+          <div class="flex justify-between items-start border-b-2 border-[#CDBF9F] pb-3">
             <div>
-              <h2 class="font-serif-journal text-xl font-bold text-[#2D2621]">Core Values Alignment Compass</h2>
-              <p class="text-sm text-[#6B5E52]">How well each era nourished my human needs and deep-held values.</p>
+              <h2 class="font-serif-journal text-xl font-bold text-[#3B3430]">Core Values Alignment Compass</h2>
+              <p class="text-sm text-[#6B625C]">How well each era nourished my human needs and deep-held values.</p>
             </div>
-            <span class="stamp-badge border-[#344966] text-[#344966]">Compass Check</span>
+            <span class="stamp-badge border-[#3B3430] text-[#3B3430]">Compass Check</span>
           </div>
 
           <div class="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
@@ -262,21 +448,21 @@
             </div>
 
             <!-- Value Definitions -->
-            <div class="space-y-3 max-w-xs text-xs text-[#6B5E52]">
-              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
-                <strong class="text-[#2D2621] block mb-0.5">🌱 Autonomy & Freedom</strong>
+            <div class="space-y-3 max-w-xs text-xs text-[#6B625C]">
+              <div class="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+                <strong class="text-[#3B3430] block mb-0.5">🌱 Autonomy & Freedom</strong>
                 How much control I had over my craft, daily rhythm, and decisions.
               </div>
-              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
-                <strong class="text-[#2D2621] block mb-0.5">🤝 Connection & Belonging</strong>
+              <div class="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+                <strong class="text-[#3B3430] block mb-0.5">🤝 Connection & Belonging</strong>
                 The presence of psychological safety and genuine human bonds.
               </div>
-              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
-                <strong class="text-[#2D2621] block mb-0.5">🎨 Creative Mastery</strong>
+              <div class="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+                <strong class="text-[#3B3430] block mb-0.5">🎨 Creative Mastery</strong>
                 Opportunity to build with care, depth, and curiosity.
               </div>
-              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
-                <strong class="text-[#2D2621] block mb-0.5">🌊 Inner Peace & Balance</strong>
+              <div class="p-2.5 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+                <strong class="text-[#3B3430] block mb-0.5">🌊 Inner Peace & Balance</strong>
                 Protection from burnout and room for personal life.
               </div>
             </div>
@@ -284,40 +470,40 @@
         </div>
 
         <!-- Reflection Prompts Sidebar -->
-        <div class="paper-card p-6 space-y-4 bg-[#FBF8F1]">
-          <h3 class="font-serif-journal text-lg font-bold text-[#2D2621] flex items-center gap-2">
-            <i data-lucide="feather" class="w-5 h-5 text-[#C85A32]"></i>
+        <div class="paper-card p-6 space-y-4 bg-[#EADFC8]">
+          <h3 class="font-serif-journal text-lg font-bold text-[#3B3430] flex items-center gap-2 border-b-2 border-[#CDBF9F] pb-2">
+            <i data-lucide="feather" class="w-5 h-5 text-[#457F7D]"></i>
             Human Reflection Questions
           </h3>
 
-          <div class="space-y-4 text-xs text-[#2D2621]">
-            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
-              <p class="font-bold text-[#C85A32]">1. What price did I pay?</p>
-              <p class="text-[#6B5E52]">Which career chapters looked impressive to others, but felt exhausting inside?</p>
+          <div class="space-y-4 text-xs text-[#3B3430]">
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+              <p class="font-bold text-[#3B3430]">1. What price did I pay?</p>
+              <p class="text-[#6B625C]">Which career chapters looked impressive to others, but felt exhausting inside?</p>
             </div>
             
-            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
-              <p class="font-bold text-[#5F7A63]">2. Who gave me light?</p>
-              <p class="text-[#6B5E52]">Who were the mentors or companions who saw me when I felt lost?</p>
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+              <p class="font-bold text-[#457F7D]">2. Who gave me light?</p>
+              <p class="text-[#6B625C]">Who were the mentors or companions who saw me when I felt lost?</p>
             </div>
 
-            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
-              <p class="font-bold text-[#344966]">3. Next Island</p>
-              <p class="text-[#6B5E52]">What is one quiet experiment I can run next month without asking for permission?</p>
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFFFF] border border-[#3B3430] shadow-sm">
+              <p class="font-bold text-[#3B3430]">3. Next Island</p>
+              <p class="text-[#6B625C]">What is one quiet experiment I can run next month without asking for permission?</p>
             </div>
           </div>
 
           <div class="pt-2 text-center">
-            <span class="font-handwritten text-lg text-[#6B5E52]">"Your career is a story you live, not a list you present."</span>
+            <span class="font-handwritten text-lg text-[#3B3430]">"Your career is a story you live, not a list you present."</span>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- VIEW 4: TRAVEL GAME -->
+    <!-- VIEW 5: TRAVEL GAME -->
     <section id="view-game" class="space-y-6 hidden h-full">
-      <div class="paper-card w-full h-[700px] overflow-hidden rounded-xl border border-[#E5DBC9]">
+      <div class="paper-card w-full h-[700px] overflow-hidden rounded-xl border-2 border-[#3B3430]">
          <iframe src="game.html" class="w-full h-full border-none" title="Travel Game"></iframe>
       </div>
     </section>
@@ -325,63 +511,63 @@
   </main>
 
   <!-- Waypoint Detail Drawer / Modal -->
-  <div id="detail-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="paper-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative transform scale-95 transition-transform duration-300" id="detail-modal-box">
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-[#3B3430]/50 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="paper-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative transform scale-95 transition-transform duration-300 bg-[#EADFC8]" id="detail-modal-box">
       
-      <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621] p-1 rounded-lg hover:bg-[#EFE6D5]">
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-[#3B3430] hover:text-[#000000] p-1 rounded-lg hover:bg-[#FFFFFF]">
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
 
       <!-- Modal Header -->
-      <div class="space-y-2 border-b border-[#E5DBC9] pb-4">
+      <div class="space-y-2 border-b-2 border-[#CDBF9F] pb-4">
         <div class="flex items-center space-x-2">
-          <span id="modal-era" class="text-xs font-bold uppercase tracking-wider text-[#C85A32] bg-[#C85A32]/10 px-2.5 py-1 rounded-md">2021-2022</span>
-          <span id="modal-type-stamp" class="stamp-badge border-[#5F7A63] text-[#5F7A63] text-xs">Sanctuary</span>
+          <span id="modal-era" class="text-xs font-bold uppercase tracking-wider text-[#FFFFFF] bg-[#3B3430] px-2.5 py-1 rounded-md">2021-2022</span>
+          <span id="modal-type-stamp" class="stamp-badge">Sanctuary</span>
         </div>
-        <h3 id="modal-title" class="font-serif-journal text-2xl font-bold text-[#2D2621]">The Overgrown Path & Career Pivot</h3>
-        <p id="modal-role" class="text-sm text-[#6B5E52] font-medium">Senior Visual & Product Designer</p>
+        <h3 id="modal-title" class="font-serif-journal text-2xl font-bold text-[#3B3430]">The Overgrown Path & Career Pivot</h3>
+        <p id="modal-role" class="text-sm text-[#6B625C] font-medium">Senior Visual & Product Designer</p>
       </div>
 
       <!-- Human Narrative Content -->
-      <div class="space-y-4 text-sm text-[#2D2621] leading-relaxed">
+      <div class="space-y-4 text-sm text-[#3B3430] leading-relaxed">
         <div>
-          <h4 class="text-xs uppercase font-bold text-[#6B5E52] tracking-wider mb-1 flex items-center gap-1.5">
-            <i data-lucide="heart" class="w-4 h-4 text-[#C85A32]"></i> The Human Story
+          <h4 class="text-xs uppercase font-bold text-[#6B625C] tracking-wider mb-1 flex items-center gap-1.5">
+            <i data-lucide="heart" class="w-4 h-4 text-[#457F7D]"></i> The Human Story
           </h4>
-          <p id="modal-story" class="bg-[#FAF6EE] p-3.5 rounded-xl border border-[#E5DBC9] italic">
+          <p id="modal-story" class="bg-[#FFFFFF] p-3.5 rounded-xl border border-[#3B3430] italic shadow-sm">
             "On paper, this was my most impressive title. But in reality, I spent evenings staring at spreadsheets feeling disconnected from my craft."
           </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
-            <h4 class="text-xs uppercase font-bold text-[#5F7A63] tracking-wider mb-1 flex items-center gap-1.5">
-              <i data-lucide="lightbulb" class="w-4 h-4"></i> Growth & Stumbles
+          <div class="p-3.5 rounded-xl border border-[#3B3430] bg-[#FFFFFF] shadow-sm">
+            <h4 class="text-xs uppercase font-bold text-[#3B3430] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="lightbulb" class="w-4 h-4 text-[#457F7D]"></i> Growth & Stumbles
             </h4>
-            <p id="modal-stumble" class="text-xs text-[#6B5E52]">
+            <p id="modal-stumble" class="text-xs text-[#6B625C]">
               I learned that high prestige cannot replace genuine peace. Failing to set boundaries led to burnout.
             </p>
           </div>
 
-          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
-            <h4 class="text-xs uppercase font-bold text-[#344966] tracking-wider mb-1 flex items-center gap-1.5">
-              <i data-lucide="users" class="w-4 h-4"></i> Companions & Mentors
+          <div class="p-3.5 rounded-xl border border-[#3B3430] bg-[#FFFFFF] shadow-sm">
+            <h4 class="text-xs uppercase font-bold text-[#3B3430] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4 text-[#457F7D]"></i> Companions & Mentors
             </h4>
-            <p id="modal-mentors" class="text-xs text-[#6B5E52]">
+            <p id="modal-mentors" class="text-xs text-[#6B625C]">
               Maya (Lead Artist) who reminded me to rest, and David who taught me how to say no graciously.
             </p>
           </div>
         </div>
 
-        <!-- Meters -->
-        <div class="pt-2 border-t border-[#E5DBC9] space-y-3">
+        <!-- Progress Meters -->
+        <div class="pt-2 border-t-2 border-[#CDBF9F] space-y-3">
           <div>
-            <div class="flex justify-between text-xs font-semibold text-[#6B5E52] mb-1">
+            <div class="flex justify-between text-xs font-semibold text-[#3B3430] mb-1">
               <span>Energy & Fulfillment Level</span>
-              <span id="modal-fulfillment-val" class="text-[#C85A32]">85%</span>
+              <span id="modal-fulfillment-val" class="text-[#457F7D]">85%</span>
             </div>
-            <div class="w-full bg-[#EFE6D5] h-2.5 rounded-full overflow-hidden">
-              <div id="modal-fulfillment-bar" class="bg-[#C85A32] h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
+            <div class="w-full bg-[#FFFFFF] border border-[#3B3430] h-3 rounded-full overflow-hidden">
+              <div id="modal-fulfillment-bar" class="bg-[#457F7D] h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
             </div>
           </div>
         </div>
@@ -389,7 +575,7 @@
       </div>
 
       <div class="pt-2 flex justify-end">
-        <button onclick="closeDetailModal()" class="px-5 py-2 bg-[#2D2621] text-white rounded-xl text-xs font-medium hover:bg-[#453b34] transition">
+        <button onclick="closeDetailModal()" class="px-5 py-2 bg-[#3B3430] text-[#F6EEEB] rounded-xl text-xs font-medium hover:bg-[#2A2522] border border-[#3B3430] transition">
           Close Chapter
         </button>
       </div>
@@ -398,67 +584,65 @@
   </div>
 
   <!-- Add Waypoint Modal -->
-  <div id="add-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="paper-card max-w-lg w-full p-6 space-y-5 relative">
-      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621]">
+  <div id="add-modal" class="fixed inset-0 z-50 bg-[#3B3430]/50 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="paper-card max-w-lg w-full p-6 space-y-5 relative bg-[#EADFC8]">
+      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-[#3B3430] hover:text-[#000000]">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
       <div>
-        <h3 class="font-serif-journal text-xl font-bold text-[#2D2621]">Add a Human Waypoint</h3>
-        <p class="text-xs text-[#6B5E52]">Record an era, detour, summit, or future horizon in your career atlas.</p>
+        <h3 class="font-serif-journal text-xl font-bold text-[#3B3430]">Add a Human Waypoint</h3>
+        <p class="text-xs text-[#6B625C]">Record an era, detour, summit, or future horizon in your career atlas.</p>
       </div>
 
       <form id="add-waypoint-form" onsubmit="handleAddWaypoint(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-[#2D2621] mb-1">Chapter Title</label>
-          <input type="text" id="add-title" required placeholder="e.g. The Sanctuary Detour, The First Leap" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+          <label class="block font-bold text-[#3B3430] mb-1">Chapter Title</label>
+          <input type="text" id="add-title" required placeholder="e.g. The Sanctuary Detour, The First Leap" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A]">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Time Era</label>
-            <input type="text" id="add-era" required placeholder="e.g. 2021 - 2022" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Time Era</label>
+            <input type="text" id="add-era" required placeholder="e.g. 2021 - 2022" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A]">
           </div>
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Waypoint Type</label>
-            <select id="add-category" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Waypoint Type</label>
+            <select id="add-category" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430]">
               <option value="Courageous Leap">Courageous Leap</option>
               <option value="Learning Detour">Learning Detour</option>
               <option value="Rest & Sanctuary">Rest & Sanctuary</option>
               <option value="Summit Era">Summit Era</option>
-              <option value="Future Horizon">Future Horizon</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-[#2D2621] mb-1">Human Narrative / Personal Reflection</label>
-          <textarea id="add-story" rows="3" required placeholder="What did this chapter feel like behind the scenes? What meant the most to you?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]"></textarea>
+          <label class="block font-bold text-[#3B3430] mb-1">Human Narrative / Personal Reflection</label>
+          <textarea id="add-story" rows="3" required placeholder="What did this chapter feel like behind the scenes?" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A]"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Key Lesson</label>
-            <input type="text" id="add-stumble" placeholder="What did you learn about yourself?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Key Lesson</label>
+            <input type="text" id="add-stumble" placeholder="What did you learn about yourself?" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A]">
           </div>
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Fulfillment (0-100%)</label>
-            <input type="number" id="add-fulfillment" min="10" max="100" value="80" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Fulfillment (0-100%)</label>
+            <input type="number" id="add-fulfillment" min="10" max="100" value="80" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430]">
           </div>
         </div>
 
         <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-[#E5DBC9] rounded-xl text-[#6B5E52]">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-[#C85A32] text-white font-medium rounded-xl hover:bg-[#b04d28] transition">Save to Atlas</button>
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border-2 border-[#3B3430] bg-[#FFFFFF] rounded-xl text-[#3B3430] font-bold">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-[#457F7D] text-[#FFFFFF] font-bold rounded-xl border border-[#3B3430] hover:bg-[#386765] transition">Save to Atlas</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- JavaScript Application Logic -->
   <script>
-    // Initial Humanized Sample Data
+    // Initial Waypoints Data
     let waypoints = [
       {
         id: 'wp-1',
@@ -519,55 +703,101 @@
     ];
 
     let currentFilter = 'All';
+    let mapZoomScale = 1.0;
     let audioPlaying = false;
     let audioContext = null;
     let noiseNode = null;
+    
+    let leafletMap = null;
+    let markersLayer = null;
+    const morrisTowns = [
+      { name: "Parsippany-Troy Hills", lat: 40.8653, lng: -74.4174, pop: "56,162" },
+      { name: "Mount Olive", lat: 40.8523, lng: -74.7431, pop: "28,958" },
+      { name: "Randolph", lat: 40.8458, lng: -74.5776, pop: "25,734" },
+      { name: "Rockaway Township", lat: 40.9427, lng: -74.4988, pop: "25,053" },
+      { name: "Roxbury", lat: 40.8711, lng: -74.6534, pop: "22,810" },
+      { name: "Morristown", lat: 40.7968, lng: -74.4815, pop: "20,180" }
+    ];
 
-    // Helper function to safely initialize Lucide icons
     function safeInitIcons() {
       if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
         lucide.createIcons();
       }
     }
 
-    // Initialize Application
     document.addEventListener("DOMContentLoaded", () => {
       safeInitIcons();
       renderFilters();
       renderMapNodes();
       renderJournalCards();
       drawValuesCompass();
-      
-      // Window resize re-draws canvas and map path
+      initLeafletMap();
+
       window.addEventListener('resize', () => {
         renderMapNodes();
         drawValuesCompass();
       });
     });
 
-    // Navigation Switcher
     function switchView(viewName) {
-      document.querySelectorAll('#view-map, #view-journal, #view-compass, #view-game').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('#view-map, #view-ai, #view-journal, #view-compass, #view-game').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
-        btn.classList.add('text-[#6B5E52]');
+        btn.classList.remove('bg-[#FFFFFF]', 'text-[#3B3430]', 'font-bold', 'border', 'border-[#3B3430]', 'shadow-sm');
+        btn.classList.add('text-[#F6EEEB]');
       });
 
       document.getElementById(`view-${viewName}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`nav-${viewName}`);
-      activeBtn.classList.add('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
-      activeBtn.classList.remove('text-[#6B5E52]');
+      if(activeBtn) {
+        activeBtn.classList.add('bg-[#FFFFFF]', 'text-[#3B3430]', 'font-bold', 'border', 'border-[#3B3430]', 'shadow-sm');
+        activeBtn.classList.remove('text-[#F6EEEB]');
+      }
 
-      if (viewName === 'map') renderMapNodes();
+      if (viewName === 'map') {
+        renderMapNodes();
+        if (leafletMap) {
+          setTimeout(() => leafletMap.invalidateSize(), 100);
+        }
+      }
       if (viewName === 'compass') drawValuesCompass();
     }
 
-    // Render Filter Buttons
+    function initLeafletMap() {
+      leafletMap = L.map('leaflet-map-container').setView([40.86, -74.55], 11);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }).addTo(leafletMap);
+
+      markersLayer = L.layerGroup().addTo(leafletMap);
+      renderMapMarkers(morrisTowns);
+
+      const searchInput = document.getElementById('map-search');
+      if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const term = e.target.value.toLowerCase();
+          const filteredTowns = morrisTowns.filter(t => t.name.toLowerCase().includes(term));
+          renderMapMarkers(filteredTowns);
+        });
+      }
+    }
+
+    function renderMapMarkers(towns) {
+      markersLayer.clearLayers();
+      towns.forEach(town => {
+        const marker = L.marker([town.lat, town.lng])
+          .bindPopup(`<div class="p-1 font-sans"><b class="text-[#3B3430]">${town.name}</b><br><span class="text-xs text-[#6B625C]">Pop: ${town.pop}</span></div>`)
+          .addTo(markersLayer);
+      });
+    }
+
     function renderFilters() {
       const categories = ['All', 'Courageous Leap', 'Learning Detour', 'Rest & Sanctuary', 'Summit Era'];
       const container = document.getElementById('category-filters');
       container.innerHTML = categories.map(cat => `
-        <button onclick="filterCategory('${cat}')" class="px-2.5 py-1 rounded-md text-xs font-medium transition ${currentFilter === cat ? 'bg-[#2D2621] text-white' : 'bg-[#FAF6EE] text-[#6B5E52] border border-[#E5DBC9] hover:bg-[#EFE6D5]'}">
+        <button onclick="filterCategory('${cat}')" class="px-3 py-1 rounded-md text-xs font-bold transition border border-[#3B3430] ${currentFilter === cat ? 'bg-[#3B3430] text-[#F6EEEB]' : 'bg-[#FFFFFF] text-[#3B3430] hover:bg-[#F6EEEB]'}">
           ${cat}
         </button>
       `).join('');
@@ -580,7 +810,16 @@
       renderJournalCards();
     }
 
-    // Render Map Waypoint Nodes
+    function zoomMap(factor) {
+      mapZoomScale *= factor;
+      mapZoomScale = Math.max(0.7, Math.min(1.8, mapZoomScale));
+      const container = document.getElementById('map-nodes-container');
+      if (container) {
+        container.style.transform = `scale(${mapZoomScale})`;
+        container.style.transformOrigin = 'center center';
+      }
+    }
+
     function renderMapNodes() {
       const container = document.getElementById('map-nodes-container');
       if (!container) return;
@@ -588,12 +827,10 @@
 
       const filtered = waypoints.filter(w => currentFilter === 'All' || w.category === currentFilter);
 
-      // Update current chapter indicator
       if (waypoints.length > 0) {
         document.getElementById('current-chapter-name').innerText = waypoints[waypoints.length - 1].title;
       }
 
-      // Generate smooth bezier spline points
       let svgPath = '';
       if (filtered.length > 1) {
         const points = filtered.map(w => {
@@ -611,31 +848,28 @@
         svgPath += ` L ${points[points.length - 1].x} ${points[points.length - 1].y}`;
       }
 
-      document.getElementById('bezier-path').setAttribute('d', svgPath);
+      const roadPath = document.getElementById('road-path');
+      const bezierPath = document.getElementById('bezier-path');
+      if (roadPath) roadPath.setAttribute('d', svgPath);
+      if (bezierPath) bezierPath.setAttribute('d', svgPath);
 
-      // Render Nodes
       filtered.forEach((wp, index) => {
         const node = document.createElement('div');
         node.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10';
         node.style.left = `${wp.x}%`;
         node.style.top = `${wp.y}%`;
 
-        let badgeColor = 'bg-[#C85A32]';
-        if (wp.category === 'Rest & Sanctuary') badgeColor = 'bg-[#5F7A63]';
-        if (wp.category === 'Learning Detour') badgeColor = 'bg-[#D98A2B]';
-        if (wp.category === 'Summit Era') badgeColor = 'bg-[#344966]';
-
         node.innerHTML = `
           <div class="relative flex flex-col items-center">
-            <!-- Node Pin -->
-            <div onclick="openDetailModal('${wp.id}')" class="w-10 h-10 rounded-full ${badgeColor} text-white flex items-center justify-center font-bold text-xs shadow-lg border-2 border-[#FAF6EE] group-hover:scale-110 transition-transform">
+            <!-- Number badge fill Deep Charcoal Brown #3B3430 with Isabelline text #F6EEEB -->
+            <div onclick="openDetailModal('${wp.id}')" class="w-10 h-10 rounded-full bg-[#3B3430] text-[#F6EEEB] flex items-center justify-center font-bold text-xs shadow-lg border-2 border-[#3B3430] group-hover:scale-110 transition-transform">
               ${index + 1}
             </div>
 
             <!-- Hand-drawn Label -->
-            <div onclick="openDetailModal('${wp.id}')" class="mt-2 bg-[#FFFDF9] border border-[#E5DBC9] px-3 py-1 rounded-lg shadow-sm whitespace-nowrap text-center">
-              <span class="block text-xs font-bold text-[#2D2621] group-hover:text-[#C85A32] transition-colors">${wp.title}</span>
-              <span class="block text-[10px] text-[#6B5E52] font-handwritten">${wp.era}</span>
+            <div onclick="openDetailModal('${wp.id}')" class="mt-2 bg-[#FFFFFF] border-2 border-[#3B3430] px-3 py-1 rounded-lg shadow-sm whitespace-nowrap text-center">
+              <span class="block text-xs font-bold text-[#3B3430] group-hover:text-[#457F7D] transition-colors">${wp.title}</span>
+              <span class="block text-[10px] text-[#6B625C] font-handwritten">${wp.era}</span>
             </div>
           </div>
         `;
@@ -644,7 +878,6 @@
       });
     }
 
-    // Render Field Journal Stories
     function renderJournalCards() {
       const container = document.getElementById('journal-cards-container');
       if (!container) return;
@@ -654,28 +887,28 @@
       container.innerHTML = filtered.map(wp => `
         <article class="paper-card p-6 space-y-4 relative flex flex-col justify-between">
           <div class="space-y-3">
-            <div class="flex items-center justify-between border-b border-[#E5DBC9] pb-3">
+            <div class="flex items-center justify-between border-b-2 border-[#CDBF9F] pb-3">
               <div>
-                <span class="text-xs font-handwritten text-[#C85A32] text-base">${wp.era}</span>
-                <h3 class="font-serif-journal text-lg font-bold text-[#2D2621]">${wp.title}</h3>
-                <p class="text-xs text-[#6B5E52] font-medium">${wp.role}</p>
+                <span class="text-xs font-handwritten text-[#3B3430] text-base font-bold">${wp.era}</span>
+                <h3 class="font-serif-journal text-lg font-bold text-[#3B3430]">${wp.title}</h3>
+                <p class="text-xs text-[#6B625C] font-medium">${wp.role}</p>
               </div>
-              <span class="stamp-badge border-[#C85A32] text-[#C85A32] text-xs">${wp.category}</span>
+              <span class="stamp-badge">${wp.category}</span>
             </div>
 
-            <p class="text-xs text-[#2D2621] italic bg-[#FAF6EE] p-3 rounded-lg border border-[#E5DBC9] leading-relaxed">
+            <p class="text-xs text-[#3B3430] italic bg-[#FFFFFF] p-3 rounded-lg border border-[#3B3430] leading-relaxed shadow-sm">
               "${wp.story}"
             </p>
 
             <div class="text-xs space-y-1">
-              <span class="font-bold text-[#5F7A63] block">🌿 Human Takeaway:</span>
-              <p class="text-[#6B5E52]">${wp.stumble}</p>
+              <span class="font-bold text-[#457F7D] block">🌿 Human Takeaway:</span>
+              <p class="text-[#6B625C]">${wp.stumble}</p>
             </div>
           </div>
 
-          <div class="pt-3 border-t border-[#E5DBC9] flex items-center justify-between text-xs">
-            <span class="text-[#6B5E52]">Energy Fulfillment: <strong class="text-[#2D2621]">${wp.fulfillment}%</strong></span>
-            <button onclick="openDetailModal('${wp.id}')" class="text-[#C85A32] font-bold hover:underline flex items-center gap-1">
+          <div class="pt-3 border-t-2 border-[#CDBF9F] flex items-center justify-between text-xs">
+            <span class="text-[#6B625C]">Energy Fulfillment: <strong class="text-[#3B3430]">${wp.fulfillment}%</strong></span>
+            <button onclick="openDetailModal('${wp.id}')" class="text-[#457F7D] font-bold hover:underline flex items-center gap-1">
               Read Story <i data-lucide="arrow-right" class="w-3 h-3"></i>
             </button>
           </div>
@@ -685,7 +918,6 @@
       safeInitIcons();
     }
 
-    // Draw Values Compass Radar Chart
     function drawValuesCompass() {
       const canvas = document.getElementById('compass-canvas');
       if (!canvas) return;
@@ -698,20 +930,17 @@
 
       ctx.clearRect(0, 0, width, height);
 
-      // Radar Axes Labels
       const labels = ['Autonomy', 'Belonging', 'Mastery', 'Balance'];
       const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
 
-      // Draw Background Concentric Circles
-      ctx.strokeStyle = '#E5DBC9';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#CDBF9F';
+      ctx.lineWidth = 1.5;
       [0.25, 0.5, 0.75, 1].forEach(rRatio => {
         ctx.beginPath();
         ctx.arc(cX, cY, radius * rRatio, 0, Math.PI * 2);
         ctx.stroke();
       });
 
-      // Draw Axes Lines
       angles.forEach((angle, i) => {
         const x = cX + Math.cos(angle - Math.PI / 2) * radius;
         const y = cY + Math.sin(angle - Math.PI / 2) * radius;
@@ -721,16 +950,14 @@
         ctx.lineTo(x, y);
         ctx.stroke();
 
-        // Label
-        ctx.fillStyle = '#6B5E52';
-        ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+        ctx.fillStyle = '#3B3430';
+        ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
         ctx.textAlign = 'center';
-        const lx = cX + Math.cos(angle - Math.PI / 2) * (radius + 18);
-        const ly = cY + Math.sin(angle - Math.PI / 2) * (radius + 18) + 4;
+        const lx = cX + Math.cos(angle - Math.PI / 2) * (radius + 20);
+        const ly = cY + Math.sin(angle - Math.PI / 2) * (radius + 20) + 4;
         ctx.fillText(labels[i], lx, ly);
       });
 
-      // Calculate Average Values across all waypoints
       if (waypoints.length === 0) return;
       const avgValues = {
         autonomy: waypoints.reduce((acc, w) => acc + (w.values?.autonomy || 70), 0) / waypoints.length,
@@ -746,7 +973,6 @@
         avgValues.balance / 100
       ];
 
-      // Draw Filled Radar Area
       ctx.beginPath();
       valArray.forEach((val, i) => {
         const angle = angles[i] - Math.PI / 2;
@@ -757,14 +983,13 @@
       });
       ctx.closePath();
 
-      ctx.fillStyle = 'rgba(200, 90, 50, 0.25)';
+      ctx.fillStyle = 'rgba(69, 127, 125, 0.35)';
       ctx.fill();
-      ctx.strokeStyle = '#C85A32';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#457F7D';
+      ctx.lineWidth = 3;
       ctx.stroke();
     }
 
-    // Modal Actions
     function openDetailModal(id) {
       const wp = waypoints.find(w => w.id === id);
       if (!wp) return;
@@ -833,7 +1058,28 @@
       drawValuesCompass();
     }
 
-    // Cozy Ambient Rain/Soft Noise Generator using Web Audio API
+    function sendChatMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const messages = document.getElementById('chat-messages');
+      if (!input || !input.value.trim()) return;
+
+      const userText = input.value.trim();
+      const userBubble = document.createElement('div');
+      userBubble.className = 'p-3 rounded-xl bg-[#FFFFFF] border-2 border-[#3B3430] text-xs text-[#3B3430] ml-4 shadow-sm';
+      userBubble.innerHTML = `<p class="font-bold text-[#3B3430] mb-0.5 text-right">You:</p><p class="text-right">${userText}</p>`;
+      messages.appendChild(userBubble);
+
+      input.value = '';
+
+      setTimeout(() => {
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'p-3 rounded-xl bg-[#FFFFFF] border border-[#3B3430] text-xs text-[#3B3430] shadow-sm';
+        aiBubble.innerHTML = `<p class="font-bold text-[#457F7D] mb-1">Atlas AI Advisor:</p><p>That's a great question about transit & skill leaps! Looking at your route, starting with hands-on projects will give you the strongest momentum.</p>`;
+        messages.appendChild(aiBubble);
+        messages.scrollTop = messages.scrollHeight;
+      }, 600);
+    }
+
     function toggleAudio() {
       const btnText = document.getElementById('audio-text');
       const btnIcon = document.getElementById('audio-icon');
@@ -843,7 +1089,6 @@
           const AudioContext = window.AudioContext || window.webkitAudioContext;
           audioContext = new AudioContext();
 
-          // Generate soft white noise buffer for gentle campfire/rain sound
           const bufferSize = audioContext.sampleRate * 2;
           const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
           const output = noiseBuffer.getChannelData(0);
@@ -855,13 +1100,12 @@
           noiseNode.buffer = noiseBuffer;
           noiseNode.loop = true;
 
-          // Lowpass filter to make it sound like cozy ambient rain
           const filter = audioContext.createBiquadFilter();
           filter.type = 'lowpass';
           filter.frequency.value = 400;
 
           const gainNode = audioContext.createGain();
-          gainNode.gain.value = 0.03; // Very gentle volume
+          gainNode.gain.value = 0.03;
 
           noiseNode.connect(filter);
           filter.connect(gainNode);
