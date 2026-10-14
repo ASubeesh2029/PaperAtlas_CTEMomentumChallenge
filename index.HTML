@@ -1,1 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paper Atlas Career Map - Humanized Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <style>
+    :root {
+      --paper-cream: #FAF6EE;
+      --paper-card: #FFFDF9;
+      --paper-border: #E5DBC9;
+      --ink-dark: #2D2621;
+      --ink-muted: #6B5E52;
+      --terracotta: #C85A32;
+      --sage: #5F7A63;
+      --indigo-map: #344966;
+      --amber-warm: #D98A2B;
+    }
 
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--paper-cream);
+      color: var(--ink-dark);
+      background-image: 
+        radial-gradient(rgba(180, 160, 135, 0.15) 1px, transparent 1px),
+        linear-gradient(to right, rgba(180, 160, 135, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(180, 160, 135, 0.04) 1px, transparent 1px);
+      background-size: 20px 20px, 40px 40px, 40px 40px;
+    }
+
+    .font-handwritten {
+      font-family: 'Caveat', cursive;
+    }
+
+    .font-serif-journal {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* Hand-drawn paper styling effects */
+    .paper-card {
+      background: var(--paper-card);
+      border: 2px solid var(--paper-border);
+      box-shadow: 3px 4px 0px rgba(85, 70, 55, 0.08);
+      border-radius: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .paper-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 5px 8px 0px rgba(85, 70, 55, 0.12);
+    }
+
+    .stamp-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border: 2px dashed currentColor;
+      border-radius: 6px;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      transform: rotate(-2deg);
+    }
+
+    /* Sketchy organic SVG path animation */
+    .map-path-line {
+      stroke-dasharray: 8 6;
+      animation: dash 30s linear infinite;
+    }
+
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -100;
+      }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F0E8DA;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CDBEAA;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #A89882;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-900">
+
+  <!-- Navigation / Header -->
+  <header class="border-b-2 border-[#E5DBC9] bg-[#FAF6EE]/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-[#C85A32]/10 border-2 border-[#C85A32] flex items-center justify-center text-[#C85A32]">
+          <i data-lucide="compass" class="w-6 h-6 animate-spin-slow"></i>
+        </div>
+        <div>
+          <h1 class="font-serif-journal text-2xl font-bold text-[#2D2621] flex items-center gap-2">
+            My Human Career Atlas
+            <span class="text-xs font-handwritten text-[#C85A32] border border-[#C85A32] px-2 py-0.5 rounded-full rotate-2">
+              Living Map
+            </span>
+          </h1>
+          <p class="text-xs text-[#6B5E52]">A personal landscape of stories, detours, growth, and compass points</p>
+        </div>
+      </div>
+
+      <!-- Navigation tabs -->
+      <nav class="flex items-center space-x-1 sm:space-x-2 bg-[#EFE6D5] p-1 rounded-xl text-sm font-medium">
+        <button id="nav-map" onclick="switchView('map')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 transition bg-[#FFFDF9] text-[#2D2621] shadow-sm">
+          <i data-lucide="map" class="w-4 h-4 text-[#C85A32]"></i>
+          <span>Visual Atlas</span>
+        </button>
+        <button id="nav-journal" onclick="switchView('journal')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
+          <i data-lucide="book-open" class="w-4 h-4 text-[#5F7A63]"></i>
+          <span>Field Journal</span>
+        </button>
+        <button id="nav-compass" onclick="switchView('compass')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#6B5E52] hover:text-[#2D2621] transition">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-[#344966]"></i>
+          <span>Values Compass</span>
+        </button>
+      </nav>
+
+      <!-- Action buttons -->
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleAudio()" id="audio-btn" class="paper-card px-3 py-1.5 text-xs font-medium text-[#6B5E52] hover:text-[#2D2621] flex items-center space-x-1.5">
+          <i data-lucide="volume-x" id="audio-icon" class="w-4 h-4"></i>
+          <span id="audio-text">Cozy Ambience</span>
+        </button>
+        <button onclick="openAddModal()" class="bg-[#C85A32] hover:bg-[#b04d28] text-white px-4 py-1.5 rounded-xl text-sm font-medium shadow-md transition flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Add Waypoint</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+    <!-- Filter Bar & Mood Banner -->
+    <section class="paper-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3 w-full md:w-auto">
+        <span class="text-xs font-bold text-[#6B5E52] uppercase tracking-wider">Filter Chapters:</span>
+        <div class="flex flex-wrap gap-1.5" id="category-filters">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs text-[#6B5E52]">
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#5F7A63]"></span> High Fulfillment</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#D98A2B]"></span> Learning Detour</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#C85A32]"></span> Courageous Leap</span>
+      </div>
+    </section>
+
+    <!-- VIEW 1: MAP VIEW -->
+    <section id="view-map" class="space-y-6">
+      <div class="paper-card relative min-h-[580px] p-6 lg:p-10 overflow-hidden bg-[#FAF4E8]">
+        
+        <!-- Topographical background details -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,100 Q 200,40 400,120 T 800,80 T 1200,150" fill="none" stroke="#6B5E52" stroke-width="2"/>
+            <path d="M0,250 Q 300,180 600,280 T 1200,200" fill="none" stroke="#6B5E52" stroke-width="2"/>
+            <path d="M0,450 Q 250,380 500,480 T 1000,420" fill="none" stroke="#6B5E52" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <!-- Compass Rose Decoration -->
+        <div class="absolute top-6 right-6 opacity-25 hidden sm:block pointer-events-none">
+          <svg class="w-28 h-28" viewBox="0 0 100 100" fill="none" stroke="#2D2621">
+            <circle cx="50" cy="50" r="45" stroke-width="1" stroke-dasharray="2 2"/>
+            <path d="M50 5 L50 95 M5 L50 L95 50" stroke-width="1.5"/>
+            <path d="M50 15 L58 42 L85 50 L58 58 L50 85 L42 58 L15 50 L42 42 Z" fill="#344966" opacity="0.3"/>
+            <text x="47" y="12" class="text-[8px] font-bold">N</text>
+            <text x="47" y="96" class="text-[8px] font-bold">S</text>
+          </svg>
+        </div>
+
+        <!-- Map Title Banner -->
+        <div class="mb-6 flex justify-between items-start">
+          <div>
+            <h2 class="font-serif-journal text-xl font-bold text-[#2D2621]">The Topography of My Journey</h2>
+            <p class="text-sm text-[#6B5E52]">Click any waypoint island to unearth the human stories, stumbles, and lessons behind it.</p>
+          </div>
+          <div class="font-handwritten text-lg text-[#C85A32] flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>"Not all who wander are lost"</span>
+          </div>
+        </div>
+
+        <!-- SVG Map Container for Connecting Bezier Curve -->
+        <div class="relative w-full h-[420px]" id="map-canvas-container">
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" id="map-svg-lines">
+            <path id="bezier-path" d="" fill="none" stroke="#C85A32" stroke-width="3" stroke-linecap="round" class="map-path-line opacity-75"/>
+          </svg>
+
+          <!-- Dynamic Nodes rendered by JavaScript -->
+          <div id="map-nodes-container" class="relative w-full h-full"></div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-[#E5DBC9] flex flex-wrap items-center justify-between text-xs text-[#6B5E52] gap-2">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="info" class="w-4 h-4 text-[#344966]"></i>
+            <span>Waypoints reflect emotional states, key mentors, and pivotal life turns rather than just job titles.</span>
+          </div>
+          <div class="font-handwritten text-base text-[#2D2621]">
+            Current Chapter: <span class="font-bold text-[#C85A32]" id="current-chapter-name">Loading...</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 2: FIELD JOURNAL STORIES -->
+    <section id="view-journal" class="space-y-6 hidden">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="font-serif-journal text-2xl font-bold text-[#2D2621]">Field Journal Entries</h2>
+          <p class="text-sm text-[#6B5E52]">Honest notes on what was happening behind the resume lines.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="journal-cards-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: VALUES COMPASS -->
+    <section id="view-compass" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Radar Alignment Card -->
+        <div class="paper-card p-6 lg:col-span-2 space-y-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="font-serif-journal text-xl font-bold text-[#2D2621]">Core Values Alignment Compass</h2>
+              <p class="text-sm text-[#6B5E52]">How well each era nourished my human needs and deep-held values.</p>
+            </div>
+            <span class="stamp-badge border-[#344966] text-[#344966]">Compass Check</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-around gap-6 py-4">
+            <!-- Canvas for Values Radar -->
+            <div class="w-64 h-64 relative flex items-center justify-center">
+              <canvas id="compass-canvas" width="260" height="260" class="max-w-full h-auto"></canvas>
+            </div>
+
+            <!-- Value Definitions -->
+            <div class="space-y-3 max-w-xs text-xs text-[#6B5E52]">
+              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
+                <strong class="text-[#2D2621] block mb-0.5">🌱 Autonomy & Freedom</strong>
+                How much control I had over my craft, daily rhythm, and decisions.
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
+                <strong class="text-[#2D2621] block mb-0.5">🤝 Connection & Belonging</strong>
+                The presence of psychological safety and genuine human bonds.
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
+                <strong class="text-[#2D2621] block mb-0.5">🎨 Creative Mastery</strong>
+                Opportunity to build with care, depth, and curiosity.
+              </div>
+              <div class="p-2.5 rounded-lg bg-[#FAF6EE] border border-[#E5DBC9]">
+                <strong class="text-[#2D2621] block mb-0.5">🌊 Inner Peace & Balance</strong>
+                Protection from burnout and room for personal life.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reflection Prompts Sidebar -->
+        <div class="paper-card p-6 space-y-4 bg-[#FBF8F1]">
+          <h3 class="font-serif-journal text-lg font-bold text-[#2D2621] flex items-center gap-2">
+            <i data-lucide="feather" class="w-5 h-5 text-[#C85A32]"></i>
+            Human Reflection Questions
+          </h3>
+
+          <div class="space-y-4 text-xs text-[#2D2621]">
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
+              <p class="font-bold text-[#C85A32]">1. What price did I pay?</p>
+              <p class="text-[#6B5E52]">Which career chapters looked impressive to others, but felt exhausting inside?</p>
+            </div>
+            
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
+              <p class="font-bold text-[#5F7A63]">2. Who gave me light?</p>
+              <p class="text-[#6B5E52]">Who were the mentors or companions who saw me when I felt lost?</p>
+            </div>
+
+            <div class="space-y-1.5 p-3 rounded-lg bg-[#FFFDF9] border border-[#E5DBC9]">
+              <p class="font-bold text-[#344966]">3. Next Island</p>
+              <p class="text-[#6B5E52]">What is one quiet experiment I can run next month without asking for permission?</p>
+            </div>
+          </div>
+
+          <div class="pt-2 text-center">
+            <span class="font-handwritten text-lg text-[#6B5E52]">"Your career is a story you live, not a list you present."</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Waypoint Detail Drawer / Modal -->
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="paper-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative transform scale-95 transition-transform duration-300" id="detail-modal-box">
+      
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621] p-1 rounded-lg hover:bg-[#EFE6D5]">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="space-y-2 border-b border-[#E5DBC9] pb-4">
+        <div class="flex items-center space-x-2">
+          <span id="modal-era" class="text-xs font-bold uppercase tracking-wider text-[#C85A32] bg-[#C85A32]/10 px-2.5 py-1 rounded-md">2021-2022</span>
+          <span id="modal-type-stamp" class="stamp-badge border-[#5F7A63] text-[#5F7A63] text-xs">Sanctuary</span>
+        </div>
+        <h3 id="modal-title" class="font-serif-journal text-2xl font-bold text-[#2D2621]">The Overgrown Path & Career Pivot</h3>
+        <p id="modal-role" class="text-sm text-[#6B5E52] font-medium">Senior Visual & Product Designer</p>
+      </div>
+
+      <!-- Human Narrative Content -->
+      <div class="space-y-4 text-sm text-[#2D2621] leading-relaxed">
+        <div>
+          <h4 class="text-xs uppercase font-bold text-[#6B5E52] tracking-wider mb-1 flex items-center gap-1.5">
+            <i data-lucide="heart" class="w-4 h-4 text-[#C85A32]"></i> The Human Story
+          </h4>
+          <p id="modal-story" class="bg-[#FAF6EE] p-3.5 rounded-xl border border-[#E5DBC9] italic">
+            "On paper, this was my most impressive title. But in reality, I spent evenings staring at spreadsheets feeling disconnected from my craft."
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
+            <h4 class="text-xs uppercase font-bold text-[#5F7A63] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="lightbulb" class="w-4 h-4"></i> Growth & Stumbles
+            </h4>
+            <p id="modal-stumble" class="text-xs text-[#6B5E52]">
+              I learned that high prestige cannot replace genuine peace. Failing to set boundaries led to burnout.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
+            <h4 class="text-xs uppercase font-bold text-[#344966] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4"></i> Companions & Mentors
+            </h4>
+            <p id="modal-mentors" class="text-xs text-[#6B5E52]">
+              Maya (Lead Artist) who reminded me to rest, and David who taught me how to say no graciously.
+            </p>
+          </div>
+        </div>
+
+        <!-- Meters -->
+        <div class="pt-2 border-t border-[#E5DBC9] space-y-3">
+          <div>
+            <div class="flex justify-between text-xs font-semibold text-[#6B5E52] mb-1">
+              <span>Energy & Fulfillment Level</span>
+              <span id="modal-fulfillment-val" class="text-[#C85A32]">85%</span>
+            </div>
+            <div class="w-full bg-[#EFE6D5] h-2.5 rounded-full overflow-hidden">
+              <div id="modal-fulfillment-bar" class="bg-[#C85A32] h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeDetailModal()" class="px-5 py-2 bg-[#2D2621] text-white rounded-xl text-xs font-medium hover:bg-[#453b34] transition">
+          Close Chapter
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add Waypoint Modal -->
+  <div id="add-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="paper-card max-w-lg w-full p-6 space-y-5 relative">
+      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621]">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <h3 class="font-serif-journal text-xl font-bold text-[#2D2621]">Add a Human Waypoint</h3>
+        <p class="text-xs text-[#6B5E52]">Record an era, detour, summit, or future horizon in your career atlas.</p>
+      </div>
+
+      <form id="add-waypoint-form" onsubmit="handleAddWaypoint(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-[#2D2621] mb-1">Chapter Title</label>
+          <input type="text" id="add-title" required placeholder="e.g. The Sanctuary Detour, The First Leap" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-[#2D2621] mb-1">Time Era</label>
+            <input type="text" id="add-era" required placeholder="e.g. 2021 - 2022" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+          </div>
+          <div>
+            <label class="block font-bold text-[#2D2621] mb-1">Waypoint Type</label>
+            <select id="add-category" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+              <option value="Courageous Leap">Courageous Leap</option>
+              <option value="Learning Detour">Learning Detour</option>
+              <option value="Rest & Sanctuary">Rest & Sanctuary</option>
+              <option value="Summit Era">Summit Era</option>
+              <option value="Future Horizon">Future Horizon</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-[#2D2621] mb-1">Human Narrative / Personal Reflection</label>
+          <textarea id="add-story" rows="3" required placeholder="What did this chapter feel like behind the scenes? What meant the most to you?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-[#2D2621] mb-1">Key Lesson</label>
+            <input type="text" id="add-stumble" placeholder="What did you learn about yourself?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+          </div>
+          <div>
+            <label class="block font-bold text-[#2D2621] mb-1">Fulfillment (0-100%)</label>
+            <input type="number" id="add-fulfillment" min="10" max="100" value="80" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end space-x-2">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-[#E5DBC9] rounded-xl text-[#6B5E52]">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-[#C85A32] text-white font-medium rounded-xl hover:bg-[#b04d28] transition">Save to Atlas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Initial Humanized Sample Data
+    let waypoints = [
+      {
+        id: 'wp-1',
+        title: 'The First Spark',
+        role: 'Junior Creative Apprentice',
+        era: '2018 - 2019',
+        category: 'Courageous Leap',
+        story: 'I remember sitting in a tiny shared apartment with raw excitement and overwhelming imposter feelings. Taking my first creative role felt terrifying, but it ignited my craft.',
+        stumble: 'Perfectionism held me back from sharing early drafts. I learned that done is kinder to oneself than flawless.',
+        mentors: 'Elena (Lead Designer) who taught me to sketch on scrap paper first.',
+        fulfillment: 80,
+        x: 12,
+        y: 65,
+        values: { autonomy: 60, connection: 85, mastery: 75, balance: 70 }
+      },
+      {
+        id: 'wp-2',
+        title: 'The Overgrown Path',
+        role: 'Senior Product Specialist',
+        era: '2020 - 2021',
+        category: 'Learning Detour',
+        story: 'Promoted quickly into corporate strategy. On Linkedin it looked like rapid success, but I was grinding 60-hour weeks, missing family dinners, and feeling drained.',
+        stumble: 'I mistook prestige for happiness. Realized that external applause cannot cure internal exhaustion.',
+        mentors: 'Marcus, who pulled me aside and said: "You don\'t have to burn down your health for a deadline."',
+        fulfillment: 38,
+        x: 35,
+        y: 28,
+        values: { autonomy: 40, connection: 50, mastery: 65, balance: 25 }
+      },
+      {
+        id: 'wp-3',
+        title: 'The Sanctuary Sabbatical',
+        role: 'Independent Mentor & Builder',
+        era: '2021 - 2022',
+        category: 'Rest & Sanctuary',
+        story: 'I stepped back to breathe. Spent 4 months teaching youth digital design at a community center and rebuilding my personal relationship with art.',
+        stumble: 'Felt guilty for taking rest in a hustle-obsessed world. Learned that rest is non-negotiable nourishment.',
+        mentors: 'Aunt Clara and the local community workshop group.',
+        fulfillment: 92,
+        x: 58,
+        y: 72,
+        values: { autonomy: 95, connection: 90, mastery: 80, balance: 95 }
+      },
+      {
+        id: 'wp-4',
+        title: 'The Human-Centered Studio',
+        role: 'Lead Design Strategist & Mentor',
+        era: '2023 - Present',
+        category: 'Summit Era',
+        story: 'Now co-leading a purpose-driven studio focusing on accessible tech. We practice 4-day workweeks, open feedback, and authentic human connection.',
+        stumble: 'Learning how to shield my team from unnecessary noise while giving them space to make their own mistakes.',
+        mentors: 'My team members who teach me patience every single day.',
+        fulfillment: 95,
+        x: 82,
+        y: 40,
+        values: { autonomy: 85, connection: 95, mastery: 90, balance: 88 }
+      }
+    ];
+
+    let currentFilter = 'All';
+    let audioPlaying = false;
+    let audioContext = null;
+    let noiseNode = null;
+
+    // Helper function to safely initialize Lucide icons
+    function safeInitIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+    }
+
+    // Initialize Application
+    document.addEventListener("DOMContentLoaded", () => {
+      safeInitIcons();
+      renderFilters();
+      renderMapNodes();
+      renderJournalCards();
+      drawValuesCompass();
+      
+      // Window resize re-draws canvas and map path
+      window.addEventListener('resize', () => {
+        renderMapNodes();
+        drawValuesCompass();
+      });
+    });
+
+    // Navigation Switcher
+    function switchView(viewName) {
+      document.querySelectorAll('#view-map, #view-journal, #view-compass').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
+        btn.classList.add('text-[#6B5E52]');
+      });
+
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-${viewName}`);
+      activeBtn.classList.add('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
+      activeBtn.classList.remove('text-[#6B5E52]');
+
+      if (viewName === 'map') renderMapNodes();
+      if (viewName === 'compass') drawValuesCompass();
+    }
+
+    // Render Filter Buttons
+    function renderFilters() {
+      const categories = ['All', 'Courageous Leap', 'Learning Detour', 'Rest & Sanctuary', 'Summit Era'];
+      const container = document.getElementById('category-filters');
+      container.innerHTML = categories.map(cat => `
+        <button onclick="filterCategory('${cat}')" class="px-2.5 py-1 rounded-md text-xs font-medium transition ${currentFilter === cat ? 'bg-[#2D2621] text-white' : 'bg-[#FAF6EE] text-[#6B5E52] border border-[#E5DBC9] hover:bg-[#EFE6D5]'}">
+          ${cat}
+        </button>
+      `).join('');
+    }
+
+    function filterCategory(cat) {
+      currentFilter = cat;
+      renderFilters();
+      renderMapNodes();
+      renderJournalCards();
+    }
+
+    // Render Map Waypoint Nodes
+    function renderMapNodes() {
+      const container = document.getElementById('map-nodes-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filtered = waypoints.filter(w => currentFilter === 'All' || w.category === currentFilter);
+
+      // Update current chapter indicator
+      if (waypoints.length > 0) {
+        document.getElementById('current-chapter-name').innerText = waypoints[waypoints.length - 1].title;
+      }
+
+      // Generate smooth bezier spline points
+      let svgPath = '';
+      if (filtered.length > 1) {
+        const points = filtered.map(w => {
+          const px = (w.x / 100) * container.clientWidth;
+          const py = (w.y / 100) * container.clientHeight;
+          return { x: px, y: py };
+        });
+
+        svgPath = `M ${points[0].x} ${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+          const xc = (points[i].x + points[i + 1].x) / 2;
+          const yc = (points[i].y + points[i + 1].y) / 2;
+          svgPath += ` Q ${points[i].x} ${points[i].y}, ${xc} ${yc}`;
+        }
+        svgPath += ` L ${points[points.length - 1].x} ${points[points.length - 1].y}`;
+      }
+
+      document.getElementById('bezier-path').setAttribute('d', svgPath);
+
+      // Render Nodes
+      filtered.forEach((wp, index) => {
+        const node = document.createElement('div');
+        node.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10';
+        node.style.left = `${wp.x}%`;
+        node.style.top = `${wp.y}%`;
+
+        let badgeColor = 'bg-[#C85A32]';
+        if (wp.category === 'Rest & Sanctuary') badgeColor = 'bg-[#5F7A63]';
+        if (wp.category === 'Learning Detour') badgeColor = 'bg-[#D98A2B]';
+        if (wp.category === 'Summit Era') badgeColor = 'bg-[#344966]';
+
+        node.innerHTML = `
+          <div class="relative flex flex-col items-center">
+            <!-- Node Pin -->
+            <div onclick="openDetailModal('${wp.id}')" class="w-10 h-10 rounded-full ${badgeColor} text-white flex items-center justify-center font-bold text-xs shadow-lg border-2 border-[#FAF6EE] group-hover:scale-110 transition-transform">
+              ${index + 1}
+            </div>
+
+            <!-- Hand-drawn Label -->
+            <div onclick="openDetailModal('${wp.id}')" class="mt-2 bg-[#FFFDF9] border border-[#E5DBC9] px-3 py-1 rounded-lg shadow-sm whitespace-nowrap text-center">
+              <span class="block text-xs font-bold text-[#2D2621] group-hover:text-[#C85A32] transition-colors">${wp.title}</span>
+              <span class="block text-[10px] text-[#6B5E52] font-handwritten">${wp.era}</span>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(node);
+      });
+    }
+
+    // Render Field Journal Stories
+    function renderJournalCards() {
+      const container = document.getElementById('journal-cards-container');
+      if (!container) return;
+
+      const filtered = waypoints.filter(w => currentFilter === 'All' || w.category === currentFilter);
+
+      container.innerHTML = filtered.map(wp => `
+        <article class="paper-card p-6 space-y-4 relative flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between border-b border-[#E5DBC9] pb-3">
+              <div>
+                <span class="text-xs font-handwritten text-[#C85A32] text-base">${wp.era}</span>
+                <h3 class="font-serif-journal text-lg font-bold text-[#2D2621]">${wp.title}</h3>
+                <p class="text-xs text-[#6B5E52] font-medium">${wp.role}</p>
+              </div>
+              <span class="stamp-badge border-[#C85A32] text-[#C85A32] text-xs">${wp.category}</span>
+            </div>
+
+            <p class="text-xs text-[#2D2621] italic bg-[#FAF6EE] p-3 rounded-lg border border-[#E5DBC9] leading-relaxed">
+              "${wp.story}"
+            </p>
+
+            <div class="text-xs space-y-1">
+              <span class="font-bold text-[#5F7A63] block">🌿 Human Takeaway:</span>
+              <p class="text-[#6B5E52]">${wp.stumble}</p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#E5DBC9] flex items-center justify-between text-xs">
+            <span class="text-[#6B5E52]">Energy Fulfillment: <strong class="text-[#2D2621]">${wp.fulfillment}%</strong></span>
+            <button onclick="openDetailModal('${wp.id}')" class="text-[#C85A32] font-bold hover:underline flex items-center gap-1">
+              Read Story <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </button>
+          </div>
+        </article>
+      `).join('');
+
+      safeInitIcons();
+    }
+
+    // Draw Values Compass Radar Chart
+    function drawValuesCompass() {
+      const canvas = document.getElementById('compass-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const cX = width / 2;
+      const cY = height / 2;
+      const radius = 80;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Radar Axes Labels
+      const labels = ['Autonomy', 'Belonging', 'Mastery', 'Balance'];
+      const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
+
+      // Draw Background Concentric Circles
+      ctx.strokeStyle = '#E5DBC9';
+      ctx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1].forEach(rRatio => {
+        ctx.beginPath();
+        ctx.arc(cX, cY, radius * rRatio, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Draw Axes Lines
+      angles.forEach((angle, i) => {
+        const x = cX + Math.cos(angle - Math.PI / 2) * radius;
+        const y = cY + Math.sin(angle - Math.PI / 2) * radius;
+
+        ctx.beginPath();
+        ctx.moveTo(cX, cY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = '#6B5E52';
+        ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        const lx = cX + Math.cos(angle - Math.PI / 2) * (radius + 18);
+        const ly = cY + Math.sin(angle - Math.PI / 2) * (radius + 18) + 4;
+        ctx.fillText(labels[i], lx, ly);
+      });
+
+      // Calculate Average Values across all waypoints
+      if (waypoints.length === 0) return;
+      const avgValues = {
+        autonomy: waypoints.reduce((acc, w) => acc + (w.values?.autonomy || 70), 0) / waypoints.length,
+        connection: waypoints.reduce((acc, w) => acc + (w.values?.connection || 70), 0) / waypoints.length,
+        mastery: waypoints.reduce((acc, w) => acc + (w.values?.mastery || 70), 0) / waypoints.length,
+        balance: waypoints.reduce((acc, w) => acc + (w.values?.balance || 70), 0) / waypoints.length,
+      };
+
+      const valArray = [
+        avgValues.autonomy / 100,
+        avgValues.connection / 100,
+        avgValues.mastery / 100,
+        avgValues.balance / 100
+      ];
+
+      // Draw Filled Radar Area
+      ctx.beginPath();
+      valArray.forEach((val, i) => {
+        const angle = angles[i] - Math.PI / 2;
+        const x = cX + Math.cos(angle) * (radius * val);
+        const y = cY + Math.sin(angle) * (radius * val);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+
+      ctx.fillStyle = 'rgba(200, 90, 50, 0.25)';
+      ctx.fill();
+      ctx.strokeStyle = '#C85A32';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Modal Actions
+    function openDetailModal(id) {
+      const wp = waypoints.find(w => w.id === id);
+      if (!wp) return;
+
+      document.getElementById('modal-era').innerText = wp.era;
+      document.getElementById('modal-title').innerText = wp.title;
+      document.getElementById('modal-role').innerText = wp.role || 'Explorer';
+      document.getElementById('modal-story').innerText = `"${wp.story}"`;
+      document.getElementById('modal-stumble').innerText = wp.stumble;
+      document.getElementById('modal-mentors').innerText = wp.mentors || 'Self-guided reflection & supportive peers';
+      document.getElementById('modal-type-stamp').innerText = wp.category;
+      document.getElementById('modal-fulfillment-val').innerText = `${wp.fulfillment}%`;
+      document.getElementById('modal-fulfillment-bar').style.width = `${wp.fulfillment}%`;
+
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('detail-modal-box').classList.remove('scale-95');
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detail-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      document.getElementById('detail-modal-box').classList.add('scale-95');
+    }
+
+    function openAddModal() {
+      const modal = document.getElementById('add-modal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeAddModal() {
+      const modal = document.getElementById('add-modal');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function handleAddWaypoint(e) {
+      e.preventDefault();
+      const title = document.getElementById('add-title').value;
+      const era = document.getElementById('add-era').value;
+      const category = document.getElementById('add-category').value;
+      const story = document.getElementById('add-story').value;
+      const stumble = document.getElementById('add-stumble').value;
+      const fulfillment = parseInt(document.getElementById('add-fulfillment').value) || 80;
+
+      const newWp = {
+        id: `wp-${Date.now()}`,
+        title,
+        role: 'Human Journey',
+        era,
+        category,
+        story,
+        stumble: stumble || 'Every step forwards holds a quiet lesson.',
+        mentors: 'Personal growth & allies',
+        fulfillment,
+        x: Math.min(90, 15 + waypoints.length * 20),
+        y: 40 + (Math.sin(waypoints.length) * 25),
+        values: { autonomy: 75, connection: 80, mastery: 85, balance: 75 }
+      };
+
+      waypoints.push(newWp);
+      closeAddModal();
+      document.getElementById('add-waypoint-form').reset();
+
+      renderMapNodes();
+      renderJournalCards();
+      drawValuesCompass();
+    }
+
+    // Cozy Ambient Rain/Soft Noise Generator using Web Audio API
+    function toggleAudio() {
+      const btnText = document.getElementById('audio-text');
+      const btnIcon = document.getElementById('audio-icon');
+
+      if (!audioPlaying) {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          audioContext = new AudioContext();
+
+          // Generate soft white noise buffer for gentle campfire/rain sound
+          const bufferSize = audioContext.sampleRate * 2;
+          const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+          }
+
+          noiseNode = audioContext.createBufferSource();
+          noiseNode.buffer = noiseBuffer;
+          noiseNode.loop = true;
+
+          // Lowpass filter to make it sound like cozy ambient rain
+          const filter = audioContext.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.value = 400;
+
+          const gainNode = audioContext.createGain();
+          gainNode.gain.value = 0.03; // Very gentle volume
+
+          noiseNode.connect(filter);
+          filter.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          noiseNode.start();
+          audioPlaying = true;
+          btnText.innerText = "Sound: On";
+          btnIcon.setAttribute('data-lucide', 'volume-2');
+          safeInitIcons();
+        } catch (err) {
+          console.log('Audio init failed', err);
+        }
+      } else {
+        if (noiseNode) noiseNode.stop();
+        if (audioContext) audioContext.close();
+        audioPlaying = false;
+        btnText.innerText = "Cozy Ambience";
+        btnIcon.setAttribute('data-lucide', 'volume-x');
+        safeInitIcons();
+      }
+    }
+  </script>
+</body>
+</html>
