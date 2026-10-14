@@ -15,25 +15,25 @@
   
   <style>
     :root {
-      --paper-cream: #FAF6EE;
-      --paper-card: #FFFDF9;
-      --paper-border: #E5DBC9;
-      --ink-dark: #2D2621;
-      --ink-muted: #6B5E52;
-      --terracotta: #C85A32;
-      --sage: #5F7A63;
-      --indigo-map: #344966;
-      --amber-warm: #D98A2B;
+      --bg-isabelline: #F6EEEB;
+      --color-white: #FFFFFF;
+      --bg-warmsand: #EADFC8;
+      --border-lighttaupe: #D9CFC4;
+      --border-darksand: #CDBF9F;
+      --text-main: #3B3430;
+      --text-muted: #6B625C;
+      --text-placeholder: #7A706A;
+      --color-teal: #457F7D;
     }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--paper-cream);
-      color: var(--ink-dark);
+      background-color: var(--bg-isabelline);
+      color: var(--text-main);
       background-image: 
-        radial-gradient(rgba(180, 160, 135, 0.15) 1px, transparent 1px),
-        linear-gradient(to right, rgba(180, 160, 135, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(180, 160, 135, 0.04) 1px, transparent 1px);
+        radial-gradient(rgba(59, 52, 48, 0.08) 1px, transparent 1px),
+        linear-gradient(to right, rgba(59, 52, 48, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(59, 52, 48, 0.03) 1px, transparent 1px);
       background-size: 20px 20px, 40px 40px, 40px 40px;
     }
 
@@ -47,16 +47,16 @@
 
     /* Hand-drawn paper styling effects */
     .paper-card {
-      background: var(--paper-card);
-      border: 2px solid var(--paper-border);
-      box-shadow: 3px 4px 0px rgba(85, 70, 55, 0.08);
+      background: var(--bg-warmsand);
+      border: 2px solid var(--text-main);
+      box-shadow: 3px 4px 0px rgba(59, 52, 48, 0.15);
       border-radius: 12px;
       transition: all 0.25s ease;
     }
 
     .paper-card:hover {
       transform: translateY(-2px);
-      box-shadow: 5px 8px 0px rgba(85, 70, 55, 0.12);
+      box-shadow: 5px 8px 0px rgba(59, 52, 48, 0.2);
     }
 
     .stamp-badge {
@@ -89,24 +89,22 @@
       background: #F0E8DA;
     }
     ::-webkit-scrollbar-thumb {
-      background: #CDBEAA;
+      background: #CDBF9F;
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #A89882;
+      background: #3B3430;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-amber-200 selection:text-amber-900">
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#457F7D] selection:text-white border-[12px] border-[#D9CFC4]">
 
   <!-- Navigation / Header -->
-  <header class="border-b-2 border-[#E5DBC9] bg-[#FAF6EE]/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3">
+  <header class="border-b-2 border-[#3B3430] bg-[#457F7D] sticky top-0 z-40 px-4 lg:px-8 py-3">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
       
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-[#C85A32]/10 border-2 border-[#C85A32] flex items-center justify-center text-[#C85A32]">
-          <i data-lucide="compass" class="w-6 h-6 animate-spin-slow"></i>
-        </div>
+      <div class="flex items-center space-x-3 bg-[#FAF6EE] px-3 py-2 rounded-xl border-2 border-[#3B3430]">
+        <img src="logo1.png" alt="Logo" class="w-10 h-10 object-contain" onerror="this.src='https://placehold.co/40x40/FAF6EE/3B3430?text=L'">
         <div>
           <h1 class="font-serif-journal text-2xl font-bold text-[#2D2621] flex items-center gap-2">
             My Human Career Atlas
@@ -115,6 +113,142 @@
             </span>
           </h1>
           <p class="text-xs text-[#6B5E52]">A personal landscape of stories, detours, growth, and compass points</p>
+        </div>
+      </div>
+
+      <!-- Navigation tabs -->
+      <nav class="flex items-center space-x-1 sm:space-x-2 bg-[#3B3430]/20 p-1 rounded-xl text-sm font-medium">
+        <button id="nav-map" onclick="switchView('map')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 transition bg-[#F6EEEB] text-[#3B3430] shadow-sm border-2 border-[#3B3430]">
+          <i data-lucide="map" class="w-4 h-4"></i>
+          <span>Visual Atlas</span>
+        </button>
+        <button id="nav-journal" onclick="switchView('journal')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#F6EEEB]/20 transition border-2 border-transparent">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Field Journal</span>
+        </button>
+        <button id="nav-compass" onclick="switchView('compass')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#F6EEEB]/20 transition border-2 border-transparent">
+          <i data-lucide="pie-chart" class="w-4 h-4"></i>
+          <span>Values Compass</span>
+        </button>
+        <button id="nav-game" onclick="switchView('game')" class="nav-btn px-3 py-1.5 rounded-lg flex items-center space-x-2 text-[#F6EEEB] hover:bg-[#F6EEEB]/20 transition border-2 border-transparent">
+          <i data-lucide="plane" class="w-4 h-4"></i>
+          <span>Travel Game</span>
+        </button>
+      </nav>
+
+      <!-- Action buttons -->
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-1.5 text-xs font-medium text-[#F6EEEB] hover:bg-[#F6EEEB]/20 rounded-xl transition flex items-center space-x-1.5">
+          <i data-lucide="volume-x" id="audio-icon" class="w-4 h-4"></i>
+          <span id="audio-text">Cozy Ambience</span>
+        </button>
+        <button onclick="openAddModal()" class="bg-[#457F7D] hover:bg-[#34615f] text-[#F6EEEB] px-4 py-1.5 rounded-xl text-sm font-bold border-2 border-[#3B3430] shadow-md transition flex items-center space-x-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Add Waypoint</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 space-y-8">
+
+    <!-- Filter Bar & Mood Banner -->
+    <section class="paper-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3 w-full md:w-auto">
+        <span class="text-xs font-bold text-[#6B625C] uppercase tracking-wider">Filter Chapters:</span>
+        <div class="flex flex-wrap gap-1.5" id="category-filters">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs text-[#6B625C]">
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#3B3430]"></span> Active</span>
+        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full border-2 border-[#3B3430] bg-[#FFFFFF]"></span> Alternate</span>
+      </div>
+    </section>
+
+    <!-- VIEW 1: MAP VIEW -->
+    <section id="view-map" class="space-y-6">
+      <div class="paper-card relative min-h-[580px] p-6 lg:p-10 overflow-hidden cursor-crosshair" onclick="handleMapClick(event)" id="map-bg-area">
+        
+        <!-- Topographical background details -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+          <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,100 Q 200,40 400,120 T 800,80 T 1200,150" fill="none" stroke="#F6EEEB" stroke-width="6" class="opacity-50"/>
+            <path d="M0,250 Q 300,180 600,280 T 1200,200" fill="none" stroke="#F6EEEB" stroke-width="4"/>
+            <path d="M0,450 Q 250,380 500,480 T 1000,420" fill="none" stroke="#F6EEEB" stroke-width="5"/>
+          </svg>
+        </div>
+
+        <!-- Compass Rose Decoration -->
+        <div class="absolute top-6 right-6 opacity-40 hidden sm:block pointer-events-none">
+          <svg class="w-28 h-28" viewBox="0 0 100 100" fill="none" stroke="#3B3430">
+            <circle cx="50" cy="50" r="45" stroke-width="2" stroke-dasharray="4 4"/>
+            <path d="M50 5 L50 95 M5 L50 L95 50" stroke-width="2"/>
+            <path d="M50 15 L58 42 L85 50 L58 58 L50 85 L42 58 L15 50 L42 42 Z" fill="#457F7D" opacity="0.6"/>
+            <text x="46" y="12" class="text-[10px] font-bold" fill="#3B3430">N</text>
+            <text x="46" y="96" class="text-[10px] font-bold" fill="#3B3430">S</text>
+          </svg>
+        </div>
+
+        <!-- Map Title Banner -->
+        <div class="mb-6 flex justify-between items-start relative z-20 pointer-events-none">
+          <div>
+            <h2 class="font-serif-journal text-xl font-bold text-[#3B3430]">The Topography of My Journey</h2>
+            <p class="text-sm text-[#6B625C]">Click anywhere on the map to plot a new chapter. Click a waypoint to read its story.</p>
+          </div>
+          <div class="font-handwritten text-lg text-[#3B3430] flex items-center gap-1 bg-[#F6EEEB] px-3 py-1 border-2 border-[#3B3430] rounded-xl shadow-[2px_2px_0px_#3B3430]">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#457F7D]"></i>
+            <span>"Not all who wander are lost"</span>
+          </div>
+        </div>
+
+        <!-- SVG Map Container for Connecting Bezier Curve -->
+        <div class="relative w-full h-[420px] z-10" id="map-canvas-container">
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" id="map-svg-lines">
+            <path id="bezier-path" d="" fill="none" stroke="#457F7D" stroke-width="4" stroke-linecap="round" class="map-path-line opacity-90"/>
+          </svg>
+
+          <!-- Dynamic Nodes rendered by JavaScript -->
+          <div id="map-nodes-container" class="relative w-full h-full"></div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t-2 border-[#CDBF9F] flex flex-wrap items-center justify-between text-xs text-[#6B625C] gap-2 relative z-20 pointer-events-none">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="info" class="w-4 h-4 text-[#3B3430]"></i>
+            <span>Waypoints reflect emotional states, key mentors, and pivotal life turns rather than just job titles.</span>
+          </div>
+          <div class="font-handwritten text-base text-[#3B3430]">
+            Current Chapter: <span class="font-bold text-[#457F7D]" id="current-chapter-name">Loading...</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- INTERACTIVE LEAFLET MAP (Moved inside Visual Atlas) -->
+      <div class="paper-card p-6 flex flex-col h-[500px]">
+        <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="font-serif-journal text-xl font-bold text-[#3B3430]">Regional Context Map</h2>
+            <p class="text-sm text-[#6B625C]">A few geographical anchors.</p>
+          </div>
+          <div class="relative w-full sm:w-64">
+            <input type="text" id="map-search" placeholder="Search locations..." class="w-full pl-9 pr-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none">
+            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#7A706A]"></i>
+          </div>
+        </div>
+        
+        <div id="leaflet-map-container" class="flex-1 w-full rounded-xl border-2 border-[#3B3430] z-10 relative" style="filter: sepia(0.3) hue-rotate(340deg) brightness(1.05);"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FIELD JOURNAL STORIES -->
+    <section id="view-journal" class="space-y-6 hidden">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="font-serif-journal text-2xl font-bold text-[#3B3430]">Field Journal Entries</h2>
+          <p class="text-sm text-[#6B625C]">Honest notes on what was happening behind the resume lines.</p>
         </div>
       </div>
 
@@ -344,63 +478,63 @@
   </main>
 
   <!-- Waypoint Detail Drawer / Modal -->
-  <div id="detail-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-[#3B3430]/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="paper-card max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative transform scale-95 transition-transform duration-300" id="detail-modal-box">
       
-      <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621] p-1 rounded-lg hover:bg-[#EFE6D5]">
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-[#3B3430] hover:text-[#457F7D] p-1 rounded-lg hover:bg-[#F6EEEB]">
         <i data-lucide="x" class="w-6 h-6"></i>
       </button>
 
       <!-- Modal Header -->
-      <div class="space-y-2 border-b border-[#E5DBC9] pb-4">
+      <div class="space-y-2 border-b-2 border-[#CDBF9F] pb-4">
         <div class="flex items-center space-x-2">
-          <span id="modal-era" class="text-xs font-bold uppercase tracking-wider text-[#C85A32] bg-[#C85A32]/10 px-2.5 py-1 rounded-md">2021-2022</span>
-          <span id="modal-type-stamp" class="stamp-badge border-[#5F7A63] text-[#5F7A63] text-xs">Sanctuary</span>
+          <span id="modal-era" class="text-xs font-bold uppercase tracking-wider text-[#3B3430] bg-[#FFFFFF] border-2 border-[#3B3430] px-2.5 py-1 rounded-md">2021-2022</span>
+          <span id="modal-type-stamp" class="stamp-badge border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] text-xs">Sanctuary</span>
         </div>
-        <h3 id="modal-title" class="font-serif-journal text-2xl font-bold text-[#2D2621]">The Overgrown Path & Career Pivot</h3>
-        <p id="modal-role" class="text-sm text-[#6B5E52] font-medium">Senior Visual & Product Designer</p>
+        <h3 id="modal-title" class="font-serif-journal text-2xl font-bold text-[#3B3430]">The Overgrown Path & Career Pivot</h3>
+        <p id="modal-role" class="text-sm text-[#6B625C] font-medium">Senior Visual & Product Designer</p>
       </div>
 
       <!-- Human Narrative Content -->
-      <div class="space-y-4 text-sm text-[#2D2621] leading-relaxed">
+      <div class="space-y-4 text-sm text-[#3B3430] leading-relaxed">
         <div>
-          <h4 class="text-xs uppercase font-bold text-[#6B5E52] tracking-wider mb-1 flex items-center gap-1.5">
-            <i data-lucide="heart" class="w-4 h-4 text-[#C85A32]"></i> The Human Story
+          <h4 class="text-xs uppercase font-bold text-[#6B625C] tracking-wider mb-1 flex items-center gap-1.5">
+            <i data-lucide="heart" class="w-4 h-4 text-[#457F7D]"></i> The Human Story
           </h4>
-          <p id="modal-story" class="bg-[#FAF6EE] p-3.5 rounded-xl border border-[#E5DBC9] italic">
-            "On paper, this was my most impressive title. But in reality, I spent evenings staring at spreadsheets feeling disconnected from my craft."
+          <p id="modal-story" class="bg-[#F6EEEB] p-3.5 rounded-xl border-2 border-[#3B3430] italic">
+            "On paper, this was my most impressive title. But in reality..."
           </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
-            <h4 class="text-xs uppercase font-bold text-[#5F7A63] tracking-wider mb-1 flex items-center gap-1.5">
-              <i data-lucide="lightbulb" class="w-4 h-4"></i> Growth & Stumbles
+          <div class="p-3.5 rounded-xl border-2 border-[#3B3430] bg-[#FFFFFF]">
+            <h4 class="text-xs uppercase font-bold text-[#3B3430] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="lightbulb" class="w-4 h-4 text-[#457F7D]"></i> Growth & Stumbles
             </h4>
-            <p id="modal-stumble" class="text-xs text-[#6B5E52]">
-              I learned that high prestige cannot replace genuine peace. Failing to set boundaries led to burnout.
+            <p id="modal-stumble" class="text-xs text-[#6B625C]">
+              I learned that high prestige cannot replace genuine peace.
             </p>
           </div>
 
-          <div class="p-3.5 rounded-xl border border-[#E5DBC9] bg-[#FFFDF9]">
-            <h4 class="text-xs uppercase font-bold text-[#344966] tracking-wider mb-1 flex items-center gap-1.5">
-              <i data-lucide="users" class="w-4 h-4"></i> Companions & Mentors
+          <div class="p-3.5 rounded-xl border-2 border-[#3B3430] bg-[#FFFFFF]">
+            <h4 class="text-xs uppercase font-bold text-[#3B3430] tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4 text-[#457F7D]"></i> Companions & Mentors
             </h4>
-            <p id="modal-mentors" class="text-xs text-[#6B5E52]">
-              Maya (Lead Artist) who reminded me to rest, and David who taught me how to say no graciously.
+            <p id="modal-mentors" class="text-xs text-[#6B625C]">
+              Maya (Lead Artist) who reminded me to rest, and David.
             </p>
           </div>
         </div>
 
         <!-- Meters -->
-        <div class="pt-2 border-t border-[#E5DBC9] space-y-3">
+        <div class="pt-2 border-t-2 border-[#CDBF9F] space-y-3">
           <div>
-            <div class="flex justify-between text-xs font-semibold text-[#6B5E52] mb-1">
+            <div class="flex justify-between text-xs font-bold text-[#6B625C] mb-1">
               <span>Energy & Fulfillment Level</span>
-              <span id="modal-fulfillment-val" class="text-[#C85A32]">85%</span>
+              <span id="modal-fulfillment-val" class="text-[#457F7D]">85%</span>
             </div>
-            <div class="w-full bg-[#EFE6D5] h-2.5 rounded-full overflow-hidden">
-              <div id="modal-fulfillment-bar" class="bg-[#C85A32] h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
+            <div class="w-full bg-[#FFFFFF] border-2 border-[#3B3430] h-3.5 rounded-full overflow-hidden p-0.5">
+              <div id="modal-fulfillment-bar" class="bg-[#457F7D] h-full rounded-full transition-all duration-500" style="width: 85%;"></div>
             </div>
           </div>
         </div>
@@ -408,7 +542,7 @@
       </div>
 
       <div class="pt-2 flex justify-end">
-        <button onclick="closeDetailModal()" class="px-5 py-2 bg-[#2D2621] text-white rounded-xl text-xs font-medium hover:bg-[#453b34] transition">
+        <button onclick="closeDetailModal()" class="px-5 py-2 bg-[#457F7D] text-[#F6EEEB] rounded-xl text-xs font-bold border-2 border-[#3B3430] hover:bg-[#34615f] transition">
           Close Chapter
         </button>
       </div>
@@ -417,31 +551,31 @@
   </div>
 
   <!-- Add Waypoint Modal -->
-  <div id="add-modal" class="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+  <div id="add-modal" class="fixed inset-0 z-50 bg-[#3B3430]/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="paper-card max-w-lg w-full p-6 space-y-5 relative">
-      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-[#6B5E52] hover:text-[#2D2621]">
+      <button onclick="closeAddModal()" class="absolute top-4 right-4 text-[#3B3430] hover:text-[#457F7D]">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div>
-        <h3 class="font-serif-journal text-xl font-bold text-[#2D2621]">Add a Human Waypoint</h3>
-        <p class="text-xs text-[#6B5E52]">Record an era, detour, summit, or future horizon in your career atlas.</p>
+      <div class="border-b-2 border-[#CDBF9F] pb-3">
+        <h3 class="font-serif-journal text-xl font-bold text-[#3B3430]">Add a Human Waypoint</h3>
+        <p class="text-xs text-[#6B625C]">Record an era, detour, summit, or future horizon. (Tip: Click the map directly to place the pin!)</p>
       </div>
 
       <form id="add-waypoint-form" onsubmit="handleAddWaypoint(event)" class="space-y-4 text-xs">
         <div>
-          <label class="block font-bold text-[#2D2621] mb-1">Chapter Title</label>
-          <input type="text" id="add-title" required placeholder="e.g. The Sanctuary Detour, The First Leap" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+          <label class="block font-bold text-[#3B3430] mb-1">Chapter Title</label>
+          <input type="text" id="add-title" required placeholder="e.g. The Sanctuary Detour" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none focus:border-[#457F7D]">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Time Era</label>
-            <input type="text" id="add-era" required placeholder="e.g. 2021 - 2022" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Time Era</label>
+            <input type="text" id="add-era" required placeholder="e.g. 2021 - 2022" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none focus:border-[#457F7D]">
           </div>
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Waypoint Type</label>
-            <select id="add-category" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Waypoint Type</label>
+            <select id="add-category" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] focus:outline-none focus:border-[#457F7D]">
               <option value="Courageous Leap">Courageous Leap</option>
               <option value="Learning Detour">Learning Detour</option>
               <option value="Rest & Sanctuary">Rest & Sanctuary</option>
@@ -452,26 +586,54 @@
         </div>
 
         <div>
-          <label class="block font-bold text-[#2D2621] mb-1">Human Narrative / Personal Reflection</label>
-          <textarea id="add-story" rows="3" required placeholder="What did this chapter feel like behind the scenes? What meant the most to you?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]"></textarea>
+          <label class="block font-bold text-[#3B3430] mb-1">Human Narrative / Personal Reflection</label>
+          <textarea id="add-story" rows="3" required placeholder="What did this chapter feel like behind the scenes?" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none focus:border-[#457F7D]"></textarea>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Key Lesson</label>
-            <input type="text" id="add-stumble" placeholder="What did you learn about yourself?" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Key Lesson</label>
+            <input type="text" id="add-stumble" placeholder="What did you learn about yourself?" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none focus:border-[#457F7D]">
           </div>
           <div>
-            <label class="block font-bold text-[#2D2621] mb-1">Fulfillment (0-100%)</label>
-            <input type="number" id="add-fulfillment" min="10" max="100" value="80" class="w-full px-3 py-2 rounded-lg border border-[#E5DBC9] bg-[#FAF6EE] focus:outline-none focus:border-[#C85A32]">
+            <label class="block font-bold text-[#3B3430] mb-1">Fulfillment (0-100%)</label>
+            <input type="number" id="add-fulfillment" min="10" max="100" value="80" class="w-full px-3 py-2 rounded-lg border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] focus:outline-none focus:border-[#457F7D]">
           </div>
         </div>
 
-        <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-[#E5DBC9] rounded-xl text-[#6B5E52]">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-[#C85A32] text-white font-medium rounded-xl hover:bg-[#b04d28] transition">Save to Atlas</button>
+        <div class="pt-2 flex justify-end space-x-2 border-t-2 border-[#CDBF9F] mt-2 pt-4">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border-2 border-[#3B3430] bg-[#FFFFFF] rounded-xl text-[#3B3430] font-bold hover:bg-[#F6EEEB]">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-[#457F7D] text-[#F6EEEB] border-2 border-[#3B3430] font-bold rounded-xl hover:bg-[#34615f] transition">Save to Atlas</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Chatbot Sidebar & Toggle -->
+  <button onclick="toggleChatbot()" class="fixed bottom-6 right-6 w-14 h-14 bg-[#457F7D] border-2 border-[#3B3430] text-[#F6EEEB] rounded-full flex items-center justify-center shadow-[4px_4px_0px_#3B3430] hover:translate-y-1 hover:shadow-[2px_2px_0px_#3B3430] transition-all z-50">
+    <i data-lucide="message-circle" class="w-6 h-6"></i>
+  </button>
+
+  <div id="chat-sidebar" class="fixed top-0 right-0 w-80 sm:w-96 h-full bg-[#EADFC8] border-l-4 border-[#3B3430] shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
+    <div class="p-4 border-b-2 border-[#CDBF9F] bg-[#457F7D] text-[#F6EEEB] flex justify-between items-center shadow-sm">
+      <h3 class="font-bold flex items-center gap-2 text-lg"><i data-lucide="bot" class="w-6 h-6"></i> Atlas Assistant</h3>
+      <button onclick="toggleChatbot()" class="hover:text-white bg-[#3B3430] p-1 rounded-md"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="flex-1 p-5 overflow-y-auto space-y-4 bg-[#F6EEEB]">
+      <div class="flex items-start gap-3">
+         <div class="w-8 h-8 rounded-full bg-[#457F7D] border-2 border-[#3B3430] flex items-center justify-center flex-shrink-0">
+           <i data-lucide="bot" class="w-4 h-4 text-[#F6EEEB]"></i>
+         </div>
+         <div class="bg-[#FFFFFF] border-2 border-[#3B3430] p-3 rounded-2xl rounded-tl-none text-[#3B3430] text-sm shadow-sm">
+           Hello! I'm currently unavailable, but I will be able to help you navigate your career map soon.
+         </div>
+      </div>
+    </div>
+    <div class="p-4 border-t-2 border-[#CDBF9F] bg-[#EADFC8]">
+      <div class="relative">
+        <input type="text" placeholder="Type a message..." disabled class="w-full pl-4 pr-10 py-3 rounded-xl border-2 border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] placeholder-[#7A706A] focus:outline-none">
+        <i data-lucide="send" class="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#7A706A]"></i>
+      </div>
     </div>
   </div>
 
@@ -581,15 +743,15 @@
     function switchView(viewName) {
       document.querySelectorAll('#view-map, #view-journal, #view-compass, #view-game').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
-        btn.classList.add('text-[#6B5E52]');
+        btn.classList.remove('bg-[#F6EEEB]', 'text-[#3B3430]', 'shadow-sm', 'border-[#3B3430]');
+        btn.classList.add('text-[#F6EEEB]', 'border-transparent');
       });
 
       document.getElementById(`view-${viewName}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`nav-${viewName}`);
       if(activeBtn) {
-        activeBtn.classList.add('bg-[#FFFDF9]', 'text-[#2D2621]', 'shadow-sm');
-        activeBtn.classList.remove('text-[#6B5E52]');
+        activeBtn.classList.add('bg-[#F6EEEB]', 'text-[#3B3430]', 'shadow-sm', 'border-[#3B3430]');
+        activeBtn.classList.remove('text-[#F6EEEB]', 'border-transparent');
       }
 
       if (viewName === 'map') {
@@ -640,7 +802,7 @@
       const categories = ['All', 'Courageous Leap', 'Learning Detour', 'Rest & Sanctuary', 'Summit Era'];
       const container = document.getElementById('category-filters');
       container.innerHTML = categories.map(cat => `
-        <button onclick="filterCategory('${cat}')" class="px-2.5 py-1 rounded-md text-xs font-medium transition ${currentFilter === cat ? 'bg-[#2D2621] text-white' : 'bg-[#FAF6EE] text-[#6B5E52] border border-[#E5DBC9] hover:bg-[#EFE6D5]'}">
+        <button onclick="filterCategory('${cat}')" class="px-3 py-1 rounded-full text-xs font-bold border-2 border-[#3B3430] transition ${currentFilter === cat ? 'bg-[#3B3430] text-[#FFFFFF]' : 'bg-[#FFFFFF] text-[#3B3430] hover:bg-[#EADFC8]'}">
           ${cat}
         </button>
       `).join('');
@@ -693,22 +855,22 @@
         node.style.left = `${wp.x}%`;
         node.style.top = `${wp.y}%`;
 
-        let badgeColor = 'bg-[#C85A32]';
-        if (wp.category === 'Rest & Sanctuary') badgeColor = 'bg-[#5F7A63]';
-        if (wp.category === 'Learning Detour') badgeColor = 'bg-[#D98A2B]';
-        if (wp.category === 'Summit Era') badgeColor = 'bg-[#344966]';
+        let isStart = index === 0;
+        let badgeBg = isStart ? 'bg-[#FFFFFF]' : 'bg-[#3B3430]';
+        let badgeText = isStart ? 'text-[#3B3430]' : 'text-[#F6EEEB]';
+        let badgeBorder = isStart ? 'border-[#457F7D]' : 'border-[#3B3430]';
 
         node.innerHTML = `
           <div class="relative flex flex-col items-center">
             <!-- Node Pin -->
-            <div onclick="openDetailModal('${wp.id}')" class="w-10 h-10 rounded-full ${badgeColor} text-white flex items-center justify-center font-bold text-xs shadow-lg border-2 border-[#FAF6EE] group-hover:scale-110 transition-transform">
+            <div onclick="openDetailModal('${wp.id}'); event.stopPropagation();" class="w-10 h-10 rounded-full ${badgeBg} ${badgeText} flex items-center justify-center font-bold text-sm shadow-md border-[3px] ${badgeBorder} group-hover:scale-110 transition-transform">
               ${index + 1}
             </div>
 
-            <!-- Hand-drawn Label -->
-            <div onclick="openDetailModal('${wp.id}')" class="mt-2 bg-[#FFFDF9] border border-[#E5DBC9] px-3 py-1 rounded-lg shadow-sm whitespace-nowrap text-center">
-              <span class="block text-xs font-bold text-[#2D2621] group-hover:text-[#C85A32] transition-colors">${wp.title}</span>
-              <span class="block text-[10px] text-[#6B5E52] font-handwritten">${wp.era}</span>
+            <!-- Label -->
+            <div onclick="openDetailModal('${wp.id}'); event.stopPropagation();" class="mt-2 bg-[#FFFFFF] border-2 border-[#3B3430] px-3 py-1 rounded-lg shadow-sm whitespace-nowrap text-center">
+              <span class="block text-xs font-bold text-[#3B3430]">${wp.title}</span>
+              <span class="block text-[10px] text-[#6B625C] font-handwritten">${wp.era}</span>
             </div>
           </div>
         `;
@@ -727,28 +889,28 @@
       container.innerHTML = filtered.map(wp => `
         <article class="paper-card p-6 space-y-4 relative flex flex-col justify-between">
           <div class="space-y-3">
-            <div class="flex items-center justify-between border-b border-[#E5DBC9] pb-3">
+            <div class="flex items-center justify-between border-b-2 border-[#CDBF9F] pb-3">
               <div>
-                <span class="text-xs font-handwritten text-[#C85A32] text-base">${wp.era}</span>
-                <h3 class="font-serif-journal text-lg font-bold text-[#2D2621]">${wp.title}</h3>
-                <p class="text-xs text-[#6B5E52] font-medium">${wp.role}</p>
+                <span class="text-xs font-handwritten text-[#6B625C] text-base">${wp.era}</span>
+                <h3 class="font-serif-journal text-lg font-bold text-[#3B3430]">${wp.title}</h3>
+                <p class="text-xs text-[#6B625C] font-medium">${wp.role}</p>
               </div>
-              <span class="stamp-badge border-[#C85A32] text-[#C85A32] text-xs">${wp.category}</span>
+              <span class="stamp-badge border-[#3B3430] bg-[#FFFFFF] text-[#3B3430] text-xs">${wp.category}</span>
             </div>
 
-            <p class="text-xs text-[#2D2621] italic bg-[#FAF6EE] p-3 rounded-lg border border-[#E5DBC9] leading-relaxed">
+            <p class="text-xs text-[#3B3430] bg-[#F6EEEB] p-3 rounded-lg border-2 border-[#3B3430] leading-relaxed">
               "${wp.story}"
             </p>
 
             <div class="text-xs space-y-1">
-              <span class="font-bold text-[#5F7A63] block">🌿 Human Takeaway:</span>
-              <p class="text-[#6B5E52]">${wp.stumble}</p>
+              <span class="font-bold text-[#3B3430] block">🌿 Human Takeaway:</span>
+              <p class="text-[#6B625C]">${wp.stumble}</p>
             </div>
           </div>
 
-          <div class="pt-3 border-t border-[#E5DBC9] flex items-center justify-between text-xs">
-            <span class="text-[#6B5E52]">Energy Fulfillment: <strong class="text-[#2D2621]">${wp.fulfillment}%</strong></span>
-            <button onclick="openDetailModal('${wp.id}')" class="text-[#C85A32] font-bold hover:underline flex items-center gap-1">
+          <div class="pt-3 border-t-2 border-[#CDBF9F] flex items-center justify-between text-xs">
+            <span class="text-[#6B625C]">Energy Fulfillment: <strong class="text-[#3B3430]">${wp.fulfillment}%</strong></span>
+            <button onclick="openDetailModal('${wp.id}')" class="bg-[#457F7D] text-[#F6EEEB] px-4 py-1.5 rounded-lg border-2 border-[#3B3430] font-bold hover:bg-[#34615f] transition flex items-center gap-1">
               Read Story <i data-lucide="arrow-right" class="w-3 h-3"></i>
             </button>
           </div>
@@ -873,6 +1035,29 @@
       modal.classList.add('opacity-0', 'pointer-events-none');
     }
 
+    let pendingMapClick = null;
+    function handleMapClick(event) {
+      if (event.target.closest('.group')) return;
+
+      const rect = document.getElementById('map-bg-area').getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+      pendingMapClick = { x, y };
+      openAddModal();
+    }
+
+    let chatOpen = false;
+    function toggleChatbot() {
+      const sidebar = document.getElementById('chat-sidebar');
+      if (chatOpen) {
+        sidebar.classList.add('translate-x-full');
+      } else {
+        sidebar.classList.remove('translate-x-full');
+      }
+      chatOpen = !chatOpen;
+    }
+
     function handleAddWaypoint(e) {
       e.preventDefault();
       const title = document.getElementById('add-title').value;
@@ -881,6 +1066,15 @@
       const story = document.getElementById('add-story').value;
       const stumble = document.getElementById('add-stumble').value;
       const fulfillment = parseInt(document.getElementById('add-fulfillment').value) || 80;
+
+      let newX = Math.min(90, 15 + waypoints.length * 20);
+      let newY = 40 + (Math.sin(waypoints.length) * 25);
+      
+      if (pendingMapClick) {
+        newX = pendingMapClick.x;
+        newY = pendingMapClick.y;
+        pendingMapClick = null;
+      }
 
       const newWp = {
         id: `wp-${Date.now()}`,
@@ -892,8 +1086,8 @@
         stumble: stumble || 'Every step forwards holds a quiet lesson.',
         mentors: 'Personal growth & allies',
         fulfillment,
-        x: Math.min(90, 15 + waypoints.length * 20),
-        y: 40 + (Math.sin(waypoints.length) * 25),
+        x: newX,
+        y: newY,
         values: { autonomy: 75, connection: 80, mastery: 85, balance: 75 }
       };
 
