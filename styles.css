@@ -812,65 +812,6 @@ body {
   font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.chat-send-btn:disabled,
-#chat-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Blinking cursor for streaming AI responses */
-@keyframes blink-cursor {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-
-.typing-cursor {
-  display: inline-block;
-  color: var(--brand-teal);
-  font-weight: 900;
-  animation: blink-cursor 0.75s step-end infinite;
-  margin-left: 1px;
-}
-
-/* AI Map pulse — bounces highlighted map pins */
-@keyframes ai-map-bounce {
-  0%   { transform: translateY(0) scale(1); }
-  25%  { transform: translateY(-10px) scale(1.15); }
-  50%  { transform: translateY(0) scale(1); }
-  75%  { transform: translateY(-5px) scale(1.08); }
-  100% { transform: translateY(0) scale(1); }
-}
-
-.ai-map-pulse {
-  animation: ai-map-bounce 0.7s ease 3;
-  filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.9));
-}
-
-/* Small pill shown in chat when map is highlighted */
-.ai-map-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  background: linear-gradient(135deg, rgba(0,242,254,0.15), rgba(79,172,254,0.15));
-  border: 1px solid rgba(0, 242, 254, 0.4);
-  color: var(--brand-teal);
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ai-map-pill:hover {
-  background: var(--brand-teal);
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(69, 127, 125, 0.35);
-  transform: translateY(-1px);
 }
 
 /* Footer */

@@ -382,14 +382,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Render Map Markers — store refs by ID for AI highlighting
+  // Render Map Markers
   const markersGroup = L.layerGroup().addTo(map);
-  const markerRefs   = {}; // id → { marker, opp }
 
   function renderMapMarkers(dataset) {
     markersGroup.clearLayers();
-    Object.keys(markerRefs).forEach(k => delete markerRefs[k]);
-
     dataset.forEach(opp => {
       const marker = L.marker([opp.lat, opp.lng], {
         icon: createCustomPin(opp.color, opp.icon)
@@ -418,52 +415,6 @@ document.addEventListener("DOMContentLoaded", () => {
       popupHTML += `</div>`;
       marker.bindPopup(popupHTML);
       markersGroup.addLayer(marker);
-      markerRefs[opp.id] = { marker, opp };
-    });
-  }
-
-  // ── AI Map Controls ──────────────────────────────────────────
-  // Called by the AI chat to pulse + zoom to recommended locations
-  function highlightOpportunities(ids) {
-    if (!ids || ids.length === 0) return;
-    const validIds = ids.filter(id => markerRefs[id]);
-    if (validIds.length === 0) return;
-
-    // Dim all markers first
-    Object.entries(markerRefs).forEach(([id, ref]) => {
-      const el = ref.marker.getElement();
-      if (el) el.style.opacity = validIds.includes(id) ? '1' : '0.2';
-    });
-
-    // Pulse-highlight the recommended ones
-    validIds.forEach(id => {
-      const el = markerRefs[id].marker.getElement();
-      if (el) {
-        el.classList.remove('ai-map-pulse');
-        void el.offsetWidth; // force reflow to restart animation
-        el.classList.add('ai-map-pulse');
-      }
-    });
-
-    // Zoom map to fit all highlighted markers
-    const points = validIds.map(id => [markerRefs[id].opp.lat, markerRefs[id].opp.lng]);
-    if (points.length === 1) {
-      map.setView(points[0], 14, { animate: true });
-    } else {
-      map.fitBounds(L.latLngBounds(points).pad(0.25), { animate: true });
-    }
-
-    // Auto-reset dim after 8 seconds
-    setTimeout(resetMapHighlights, 8000);
-  }
-
-  function resetMapHighlights() {
-    Object.values(markerRefs).forEach(ref => {
-      const el = ref.marker.getElement();
-      if (el) {
-        el.style.opacity = '1';
-        el.classList.remove('ai-map-pulse');
-      }
     });
   }
 
@@ -539,211 +490,40 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('transit-section').scrollIntoView({ behavior: 'smooth' });
   });
 
-  // ============================================================
-  //  AI Career Assistant — Powered by Gemini 2.0 Flash (Google AI)
-  //  PUT YOUR API KEY HERE ↓
-  // ============================================================
-  const GEMINI_API_KEY = "AQ.Ab8RN6KoQ08cR03hUOr3O-d2_T7F5M60tUZ-2x6jQ6IZZB6rRA";
-
-  const ACTIVE_MODEL = "gemini-3.5-flash-lite";
-
-  function makeApiUrl(model) {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`;
-  }
-
-  // Conversation history — capped at 6 messages (3 turns) to keep context small & fast
-  const chatHistory = [];
-  const MAX_HISTORY = 6;
-
-  // Build a compact system prompt — shorter prompt = faster first token
-  function buildSystemPrompt() {
-    // Condensed job list: one line per opportunity
-    const oppList = opportunities.map(opp =>
-      `[${opp.id}] ${opp.company} | ${opp.category} | ${opp.jobs.map(j => `${j.title} ${j.pay}`).join(', ')} | ${opp.jobs[0].location}`
-    ).join('\n');
-
-    return `You are Paper Atlas AI — a brief, friendly NJ life-sciences career assistant.
-Help students find jobs, internships, certificates, and colleges in Morris County NJ.
-Reply in ≤80 words. Use short bullet points. Always include pay & location.
-When recommending specific places, append exactly: [HIGHLIGHT:id1,id2] (invisible to user, drives the map).
-JOBS:\n${oppList}`;
-  }
-
-  // ── Chat UI helpers ──────────────────────────────────────────
-  const chatInput   = document.getElementById('chat-input');
+  // AI Career Assistant Chat & Prompt Buttons
+  const chatInput = document.getElementById('chat-input');
   const chatSendBtn = document.getElementById('chat-send-btn');
-  const chatStream  = document.getElementById('chat-stream');
+  const chatStream = document.getElementById('chat-stream');
 
   window.usePrompt = (text) => {
     chatInput.value = text;
     handleSendChat();
   };
 
-  function appendChatMsg(sender, htmlContent) {
+  function appendChatMsg(sender, text) {
     const row = document.createElement('div');
     row.className = `chat-row ${sender}-row`;
     row.innerHTML = `
       <div class="bot-icon"><i class="fa-solid ${sender === 'ai' ? 'fa-robot' : 'fa-user'}"></i></div>
       <div class="chat-bubble">
         <strong>${sender === 'ai' ? 'Paper Atlas AI Navigator' : 'You'}</strong>
-        <p>${htmlContent}</p>
+        <p>${text}</p>
       </div>
     `;
     chatStream.appendChild(row);
     chatStream.scrollTop = chatStream.scrollHeight;
-    return row;
   }
 
-  /** Creates a streaming AI bubble and returns a ref to its <p> element */
-  function createStreamingBubble() {
-    const row = document.createElement('div');
-    row.className = 'chat-row ai-row';
-    row.innerHTML = `
-      <div class="bot-icon"><i class="fa-solid fa-robot"></i></div>
-      <div class="chat-bubble">
-        <strong>Paper Atlas AI Navigator</strong>
-        <p class="ai-stream-text"><span class="typing-cursor">▋</span></p>
-      </div>
-    `;
-    chatStream.appendChild(row);
-    chatStream.scrollTop = chatStream.scrollHeight;
-    return row.querySelector('.ai-stream-text');
-  }
-
-  async function handleSendChat() {
+  function handleSendChat() {
     const text = chatInput.value.trim();
     if (!text) return;
 
+    appendChatMsg('user', text);
     chatInput.value = '';
-    chatInput.disabled = true;
-    chatSendBtn.disabled = true;
 
-    appendChatMsg('user', escapeHtml(text));
-    chatHistory.push({ role: 'user', parts: [{ text }] });
-
-    // ── Cap history to last MAX_HISTORY messages (keeps tokens low & speed high)
-    while (chatHistory.length > MAX_HISTORY) chatHistory.shift();
-
-    const body = {
-      system_instruction: { parts: [{ text: buildSystemPrompt() }] },
-      contents: chatHistory,
-      generationConfig: {
-        temperature: 0.4,      // lower = less "thinking" = faster
-        maxOutputTokens: 250,  // short snappy answers
-        topP: 0.8,
-        topK: 20
-      }
-    };
-
-    const streamP = createStreamingBubble();
-    let fullText = '';
-
-    try {
-      const response = await fetch(makeApiUrl(ACTIVE_MODEL), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `HTTP ${response.status}`);
-      }
-
-      // Read SSE stream — batch renders with rAF to avoid layout thrashing
-      const reader  = response.body.getReader();
-      const decoder = new TextDecoder();
-      let   buffer  = '';
-      let   rafPending = false;
-      let   isStreamDone = false;
-
-      const flushRender = () => {
-        if (isStreamDone) return;
-        streamP.innerHTML = formatAiMarkdown(fullText) + '<span class="typing-cursor">▋</span>';
-        chatStream.scrollTop = chatStream.scrollHeight;
-        rafPending = false;
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          if (!line.startsWith('data: ')) continue;
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr || jsonStr === '[DONE]') continue;
-          try {
-            const chunk = JSON.parse(jsonStr);
-            const piece = chunk?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-            if (piece) {
-              fullText += piece;
-              // Batch DOM updates — only repaint once per animation frame
-              if (!rafPending) {
-                rafPending = true;
-                requestAnimationFrame(flushRender);
-              }
-            }
-          } catch (_) { /* skip partial JSON */ }
-        }
-      }
-
-      isStreamDone = true;
-
-      // ── Parse HIGHLIGHT tag and drive the map ─────────────────
-      const highlightMatch = fullText.match(/\[HIGHLIGHT:([^\]]+)\]/);
-      if (highlightMatch) {
-        const ids = highlightMatch[1].split(',').map(s => s.trim()).filter(Boolean);
-        highlightOpportunities(ids);
-
-        // Show a small interactive map nudge in the chat
-        const mapPill = document.createElement('div');
-        mapPill.className = 'ai-map-pill';
-        mapPill.innerHTML = `<i class="fa-solid fa-map-location-dot"></i> View ${ids.length} highlighted location${ids.length > 1 ? 's' : ''} on map ↑`;
-        mapPill.title = "Click to center and view highlighted locations";
-        mapPill.onclick = () => {
-          highlightOpportunities(ids);
-          document.getElementById('map-section').scrollIntoView({ behavior: 'smooth' });
-        };
-        streamP.parentElement.appendChild(mapPill);
-      }
-
-      // Final render (clean, no cursor, no tag, formatted markdown)
-      streamP.innerHTML = formatAiMarkdown(fullText) || '(No response)';
-
-      chatHistory.push({ role: 'model', parts: [{ text: fullText }] });
-
-    } catch (err) {
-      streamP.innerHTML = `⚠️ <strong>Error:</strong> ${escapeHtml(err.message)}`;
-      chatHistory.pop();
-    }
-
-    chatInput.disabled = false;
-    chatSendBtn.disabled = false;
-    chatInput.focus();
-    chatStream.scrollTop = chatStream.scrollHeight;
-  }
-
-  function formatAiMarkdown(raw) {
-    let clean = raw.replace(/\[HIGHLIGHT:[^\]]*\]/g, '').trim();
-    if (!clean) return '';
-    let escaped = escapeHtml(clean);
-    // Bold: **text** -> <strong>text</strong>
-    escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    // Bullet lines: * text or - text -> • text
-    escaped = escaped.replace(/^[\*\-]\s+(.*)$/gm, '• $1');
-    return escaped.replace(/\n/g, '<br>');
-  }
-
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+    setTimeout(() => {
+      appendChatMsg('ai', `I analyzed your interest in "${text}". Here are top local recommendations: <strong>Novartis (STEM Scholar)</strong>, <strong>Lakeview Pharmaceuticals (Lab Assistant)</strong>, and <strong>Morristown Medical Center (Specimen Processor)</strong>. I've highlighted them on your map!`);
+    }, 700);
   }
 
   chatSendBtn.addEventListener('click', handleSendChat);
