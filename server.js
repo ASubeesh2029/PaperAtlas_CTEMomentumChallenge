@@ -14,8 +14,8 @@ try {
 } catch (_) { /* no .env file */ }
 
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.ANTHROPIC_API_KEY;
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5';
+const API_KEY = process.env.GEMINI_API_KEY;
+const MODEL = process.env.GEMINI_MODEL || 'claude-sonnet-5-5';
 
 const SYSTEM = `You are the Paper Atlas assistant, a friendly career guide for high school students exploring biotech and life-sciences jobs, internships, summer work, certificates and colleges. The site focuses on Morris County, New Jersey but also maps opportunities nationwide.
 Rules:
@@ -41,7 +41,7 @@ function json(res, code, obj) {
 }
 
 async function handleChat(req, res) {
-  if (!API_KEY) return json(res, 500, { error: 'Server has no API key. Add ANTHROPIC_API_KEY to the .env file.' });
+  if (!API_KEY) return json(res, 500, { error: 'Server has no API key. Add GEMINI_API_KEY_API_KEY to the .env file.' });
   if (limited(req.socket.remoteAddress)) return json(res, 429, { error: 'Too many messages, slow down a bit.' });
 
   let raw = '';
@@ -60,9 +60,9 @@ async function handleChat(req, res) {
   const system = `${SYSTEM}\n\nStudent's starting location: ${origin || 'unknown'}\nMap listings relevant to this question (JSON): ${listings}`;
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch('https://api.GEMINI_API_KEY.com/v1/messages', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01' },
+      headers: { 'content-type': 'application/json', 'x-api-key': API_KEY, 'GEMINI_API_KEY-version': '2023-06-01' },
       body: JSON.stringify({ model: MODEL, max_tokens: 500, system, messages }),
     });
     const data = await r.json();
@@ -91,5 +91,5 @@ http.createServer((req, res) => {
   });
 }).listen(PORT, () => {
   console.log(`Paper Atlas running at http://localhost:${PORT}`);
-  if (!API_KEY) console.log('WARNING: no ANTHROPIC_API_KEY set. Chat will fall back to offline suggestions.');
+  if (!API_KEY) console.log('WARNING: no GEMINI_API_KEY set. Chat will fall back to offline suggestions.');
 });
