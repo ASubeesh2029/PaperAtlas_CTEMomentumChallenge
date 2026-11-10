@@ -31,7 +31,7 @@
   document.getElementById('chatClose').addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
 
-  add('ai', "Hi! I'm the Paper Atlas assistant. Ask me about biotech jobs, internships, colleges, or certificates, especially around Morris County, NJ.");
+  add('ai', "Hi! I'm the Paper Atlas assistant. Ask me about biotech jobs, internships, colleges, or certificates.");
 
   // Send the model a few relevant pins from the map data so answers match what's on the site.
   function relevantPins(text) {
