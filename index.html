@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paper Atlas | Biotech Career Map</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --card-border: rgba(226, 232, 240, 0.9);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-blue: #2563eb;
+
+      --color-job-bg: #fef3c7; --color-job-text: #b45309; --color-job-border: #f59e0b;
+      --color-intern-bg: #e0f2fe; --color-intern-text: #0369a1; --color-intern-border: #0284c7;
+      --color-univ-bg: #f3e8ff; --color-univ-text: #6b21a8; --color-univ-border: #9333ea;
+      --color-cert-bg: #dcfce7; --color-cert-text: #15803d; --color-cert-border: #16a34a;
+      --color-summer-bg: #ffedd5; --color-summer-text: #c2410c; --color-summer-border: #ea580c;
+
+      --font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(15, 23, 42, 0.94);
+      --card-border: rgba(51, 65, 85, 0.85);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --input-bg: #1e293b;
+      --input-border: #334155;
+      --shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.6);
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16, 185, 129, 0.15);
+      --accent-blue: #3b82f6;
+    }
+
+    /* COLORFUL DARK MODE MAP TILES */
+    [data-theme="dark"] .leaflet-tile-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(1.15) saturate(1.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ---------------- TOP NAVBAR ---------------- */
+    .app-navbar {
+      height: 60px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1.15rem;
+      color: var(--text-primary);
+    }
+
+    .brand-logo i { color: var(--accent-green); }
+
+    .nav-center-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .nav-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn.active {
+      background: var(--accent-green);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.3);
+    }
+
+    .dark-toggle-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .dark-toggle-btn:hover {
+      border-color: var(--accent-blue);
+    }
+
+    /* ---------------- VIEWPORT & TABS ---------------- */
+    .content-viewport {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 60px);
+      overflow: hidden;
+    }
+
+    .tab-view {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    /* ---------------- HOME TAB ---------------- */
+    #home-tab {
+      overflow-y: auto;
+      background: var(--bg-color);
+    }
+
+    .home-hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 28px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-ring 1.8s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span { color: var(--accent-green); }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 24px;
+      line-height: 1.5;
+    }
+
+    /* AUTOCOMPLETE CONTAINER STYLES */
+    .commute-origin-wrapper {
+      position: relative;
+      max-width: 520px;
+      margin: 0 auto 24px;
+    }
+
+    .commute-origin-box {
+      background: var(--card-bg);
+      border: 2px solid var(--input-border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s ease;
+    }
+
+    .commute-origin-box:focus-within {
+      border-color: var(--accent-green);
+    }
+
+    .commute-origin-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--font-family);
+      font-size: 0.95rem;
+      font-weight: 700;
+      width: 100%;
+      color: var(--text-primary);
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      z-index: 2000;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      text-align: left;
+    }
+
+    .autocomplete-dropdown.active {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+    }
+
+    .btn-primary {
+      background: var(--accent-green);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+
+    .home-section {
+      max-width: 1100px;
+      margin: 0 auto 48px;
+      padding: 0 24px;
+    }
+
+    .section-header { margin-bottom: 20px; }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--text-primary);
+    }
+
+    .section-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .cat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .cat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-blue);
+    }
+
+    .cat-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .cat-name { font-weight: 800; font-size: 0.95rem; color: var(--text-primary); }
+    .cat-count { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .position-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .position-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .card-category-pill {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .card-job-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .card-company-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .card-view-btn {
+      background: var(--accent-green);
+      border: none;
+      color: #FFFFFF;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    /* ---------------- MAP TAB ---------------- */
+    #map-tab { position: relative; }
+
+    /* A single border around the interactive map only */
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      box-sizing: border-box;
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .map-overlay-card {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      width: 420px;
+      max-width: calc(100vw - 40px);
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-header-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .active-count {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .search-container { position: relative; width: 100%; }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 11px 36px 11px 40px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .search-input:focus { border-color: var(--accent-blue); }
+
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      display: none;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .custom-select {
+      flex: 1;
+      padding: 9px 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .controls-panel {
+      position: absolute;
+      bottom: 25px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-btn {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-blue);
+    }
+
+    .legend-panel {
+      position: absolute;
+      bottom: 25px;
+      left: 20px;
+      z-index: 1000;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      padding: 12px 16px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .legend-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .legend-items { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+
+    .legend-badge {
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .custom-pin-wrapper { background: transparent !important; border: none !important; }
+
+    .custom-pin-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      padding: 5px 12px !important;
+      border-radius: 20px !important;
+      font-size: 12px !important;
+      font-weight: 800 !important;
+      white-space: nowrap !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.22) !important;
+      cursor: pointer !important;
+      transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+      line-height: 1.2 !important;
+    }
+
+    .custom-pin-badge:hover {
+      transform: scale(1.08) translateY(-2px) !important;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3) !important;
+      z-index: 9999 !important;
+    }
+
+    .marker-cluster-small { background-color: rgba(52, 211, 153, 0.6) !important; }
+    .marker-cluster-small div { background-color: rgba(16, 185, 129, 0.95) !important; color: white !important; font-weight: 800; }
+    
+    .marker-cluster-medium { background-color: rgba(96, 165, 250, 0.6) !important; }
+    .marker-cluster-medium div { background-color: rgba(37, 99, 235, 0.95) !important; color: white !important; font-weight: 800; }
+
+    .marker-cluster-large { background-color: rgba(139, 92, 246, 0.6) !important; }
+    .marker-cluster-large div { background-color: rgba(124, 58, 237, 0.95) !important; color: white !important; font-weight: 800; }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      z-index: 3000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active { display: flex; }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      color: var(--text-primary);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 14px; right: 18px;
+      background: none; border: none;
+      font-size: 1.8rem; cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .modal-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .commute-section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-top: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    .commute-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .commute-mode-card {
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      border-radius: 14px;
+      padding: 12px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .commute-mode-card.best-recommendation {
+      border-color: var(--accent-green);
+      background: var(--accent-green-bg);
+    }
+
+    .commute-mode-card i { font-size: 1.2rem; color: var(--accent-green); margin-bottom: 6px; }
+    .commute-mode-name { font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+    .commute-mode-time { font-size: 0.92rem; font-weight: 900; color: var(--text-primary); margin-top: 2px; }
+    .commute-mode-cost { font-size: 0.8rem; font-weight: 800; color: var(--accent-green); margin-top: 2px; }
+    .commute-mode-detail { font-size: 0.68rem; color: var(--text-muted); margin-top: 2px; }
+
+    .route-link-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--accent-green);
+      color: #FFFFFF;
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      margin-top: 12px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+  </style>
+
+
+  <!-- Design merge: cream glass / emerald styling from the first map, preserving all functionality from the full home+map site -->
+  <style id="first-map-design-merge">
+    :root {
+      --bg-color: #f6f4eb;
+      --card-bg: rgba(251, 249, 243, 0.94);
+      --card-border: rgba(229, 222, 201, 0.92);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --input-bg: rgba(255, 255, 255, 0.9);
+      --input-border: #d8d2c1;
+      --shadow: 0 20px 25px -5px rgba(0,0,0,.10), 0 8px 10px -6px rgba(0,0,0,.05);
+      --accent-green: #059669;
+      --accent-green-bg: #e8f5ed;
+      --accent-blue: #2563eb;
+    }
+    [data-theme="dark"] {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(15, 23, 42, 0.94);
+      --card-border: rgba(51, 65, 85, 0.9);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(30, 41, 59, 0.92);
+      --input-border: #334155;
+      --shadow: 0 20px 30px -8px rgba(0,0,0,.45);
+      --accent-green: #10b981;
+      --accent-green-bg: rgba(16,185,129,.15);
+      --accent-blue: #60a5fa;
+    }
+    body, html { background-color: var(--bg-color); }
+    .app-navbar, .map-overlay-card, .controls-panel .control-btn, .legend-panel,
+    .position-card, .cat-card, .commute-origin-box, .modal-card {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .app-navbar {
+      background: var(--card-bg);
+      border-bottom-color: var(--card-border);
+      box-shadow: 0 4px 18px rgba(15,23,42,.06);
+    }
+    .nav-tabs { border-color: var(--card-border); }
+    .nav-tab-btn.active { background: var(--accent-green); }
+    .dark-toggle-btn, .nav-tabs, .commute-origin-box, .search-input, .custom-select {
+      border-color: var(--input-border);
+    }
+    .hero-badge { background: var(--accent-green-bg); }
+    .cat-card, .position-card, .commute-origin-box, .map-overlay-card, .legend-panel,
+    .control-btn, .modal-card {
+      border-color: var(--card-border);
+      box-shadow: var(--shadow);
+    }
+    .cat-card, .position-card { border-radius: 18px; }
+    .map-overlay-card, .legend-panel { background: var(--card-bg); }
+    .control-btn { background: var(--card-bg); }
+    #map {
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e5e0d3;
+    }
+    .leaflet-popup-content-wrapper {
+      background: rgba(251,249,243,.98) !important;
+      color: #0f172a !important;
+      border-radius: 16px !important;
+      border: 1px solid #e5dec9 !important;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.05) !important;
+      overflow: hidden !important;
+    }
+    .leaflet-popup-content { line-height: 1.45 !important; }
+    .leaflet-popup-tip { background: #fbf9f3 !important; }
+    [data-theme="dark"] .leaflet-popup-content-wrapper {
+      background: rgba(15,23,42,.98) !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
+    }
+    [data-theme="dark"] .leaflet-popup-tip { background: #0f172a !important; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(246,244,235,.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
+    @media (max-width: 760px) {
+      .app-navbar { padding-left: 12px; padding-right: 12px; }
+      .map-overlay-card { max-width: calc(100vw - 24px); left: 12px; top: 12px; }
+    }
+  
+.legend-badge.atlas-type-pill{appearance:none;-webkit-appearance:none;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);cursor:pointer;padding:6px 10px;border-radius:999px;font:inherit;font-size:11px;font-weight:800;line-height:1.25;transition:transform .15s,border-color .15s,background .15s,color .15s;}
+.legend-badge.atlas-type-pill:hover{transform:translateY(-1px);border-color:var(--accent-green);}
+.legend-badge.atlas-type-pill.active{background:var(--accent-green);color:#fff;border-color:var(--accent-green);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent-green) 22%,transparent);}
+.legend-badge.atlas-type-pill:focus-visible{outline:3px solid var(--accent-green);outline-offset:2px;}
+  </style>
+
+
+<style id="all-features-merge-css">
+.atlas-type-pill,.atlas-hub-btn{border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;transition:transform .15s,background .15s;}
+.atlas-type-pill:hover,.atlas-hub-btn:hover{transform:translateY(-1px);border-color:var(--accent-green);}
+.atlas-type-pill.active{background:var(--accent-green);color:#fff;border-color:var(--accent-green);box-shadow:0 0 0 2px color-mix(in srgb, var(--accent-green) 22%, transparent);}
+.cat-card{cursor:pointer;transition:transform .16s,box-shadow .16s,border-color .16s;}
+.cat-card:hover,.cat-card:focus-visible{transform:translateY(-2px);border-color:var(--accent-green);box-shadow:var(--shadow);outline:none;}
+.atlas-type-pill:focus-visible,.atlas-hub-btn:focus-visible,.control-btn:focus-visible{outline:3px solid var(--accent-green);outline-offset:2px;}
+#atlasDrawerBackdrop{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:1998;opacity:0;visibility:hidden;transition:opacity .22s;backdrop-filter:blur(2px)}
+#atlasDrawerBackdrop.open{opacity:1;visibility:visible}
+#atlasDetailDrawer{position:fixed;z-index:1999;right:0;top:0;height:100dvh;width:min(470px,100vw);background:var(--card-bg);color:var(--text-primary);border-left:1px solid var(--card-border);box-shadow:-18px 0 50px rgba(15,23,42,.2);transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column;backdrop-filter:blur(18px)}
+#atlasDetailDrawer.open{transform:translateX(0)}
+.atlas-drawer-head{display:flex;justify-content:space-between;gap:12px;padding:22px;border-bottom:1px solid var(--card-border);background:rgba(5,150,105,.07)}
+.atlas-drawer-head h2{font-size:20px;font-weight:850;line-height:1.25;margin:8px 0 5px}.atlas-drawer-head p{margin:0;color:var(--accent-green);font-weight:750}
+.atlas-drawer-type{font-size:10px;font-weight:900;letter-spacing:.08em;padding:5px 9px;border-radius:999px;background:var(--accent-green-bg);color:var(--accent-green)}
+.atlas-drawer-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);font-size:24px;cursor:pointer;flex-shrink:0}
+.atlas-drawer-body{padding:20px 22px 28px;overflow:auto}.atlas-drawer-fact{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--card-border);font-size:13px}.atlas-drawer-fact b{color:var(--text-secondary)}.atlas-drawer-fact span{text-align:right;font-weight:750}
+#atlasDrawerDescription{font-size:13px;line-height:1.6;color:var(--text-secondary);margin:18px 0}.atlas-drawer-body h3{font-size:16px;font-weight:850;margin:18px 0 8px}.atlas-disclaimer{font-size:11px;line-height:1.5;color:var(--text-muted);margin:0 0 14px}
+#atlasFastApplyForm{display:grid;gap:12px}#atlasFastApplyForm label{font-size:12px;font-weight:800;display:grid;gap:6px}#atlasFastApplyForm label span{font-weight:500;color:var(--text-muted)}#atlasFastApplyForm input{width:100%;box-sizing:border-box;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-primary);border-radius:10px;padding:11px 12px;font:inherit;font-weight:500;outline-color:var(--accent-green)}
+.atlas-apply-submit,.atlas-commute-shortcut{width:100%;padding:12px;border-radius:11px;font-size:12px;font-weight:850;cursor:pointer;margin-top:4px}.atlas-apply-submit{background:var(--accent-green);color:white;border:0}.atlas-commute-shortcut{border:1px solid var(--card-border);background:var(--accent-green-bg);color:var(--accent-green)}
+#atlasToast{position:fixed;right:18px;top:18px;z-index:3001;max-width:min(420px,calc(100vw - 36px));padding:13px 17px;border-radius:13px;background:#065f46;color:white;font-size:13px;font-weight:800;box-shadow:0 12px 30px #0002;opacity:0;transform:translateY(-8px);pointer-events:none;transition:.2s}#atlasToast.show{opacity:1;transform:translateY(0)}
+[data-theme="dark"] .atlas-drawer-head{background:rgba(16,185,129,.08)}
+</style>
+
+
+<style id="ai-tab-and-details-css">
+.nav-tab-btn.ai-tab i{color:inherit}
+/* ---------- Detailed job summary ---------- */
+.job-detail{display:grid;gap:14px;font-size:.86rem;color:var(--text-secondary);line-height:1.5}
+.job-detail h5{font-size:.78rem;font-weight:800;color:var(--text-primary);margin:0 0 5px}
+.job-detail ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.job-detail .jd-overview{color:var(--text-primary);font-weight:600}
+.jd-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.jd-fact{background:var(--input-bg);border:1px solid var(--input-border);border-radius:12px;padding:9px 11px}
+.jd-fact b{display:block;font-size:.68rem;color:var(--text-muted);font-weight:800;margin-bottom:2px}
+.jd-fact span{font-weight:800;color:var(--text-primary);font-size:.84rem}
+.jd-skills{display:flex;flex-wrap:wrap;gap:6px}
+.jd-skills span{background:var(--accent-green-bg);color:var(--accent-green);border-radius:999px;padding:3px 10px;font-size:.74rem;font-weight:800}
+.jd-note{font-size:.72rem;color:var(--text-muted);border-top:1px dashed var(--card-border);padding-top:10px}
+.card-summary-line{font-size:.82rem;color:var(--text-secondary);line-height:1.45;margin-bottom:6px}
+/* ---------- AI tab ---------- */
+#ai-tab{overflow-y:auto;background:var(--bg-color)}
+.ai-shell{max-width:900px;margin:0 auto;padding:26px 20px 40px;display:grid;gap:16px}
+.ai-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ai-head h1{font-size:1.6rem;font-weight:900;color:var(--text-primary)}
+.ai-head p{color:var(--text-secondary);font-size:.9rem;margin-top:4px;max-width:560px;line-height:1.45}
+.ai-status{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 13px;font-size:.76rem;font-weight:800;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-secondary)}
+.ai-status .dot{width:9px;height:9px;border-radius:50%;background:#f59e0b}
+.ai-status.live .dot{background:var(--accent-green)}
+.ai-status.live{color:var(--accent-green)}
+.ai-settings{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;box-shadow:var(--shadow)}
+.ai-settings summary{cursor:pointer;padding:13px 16px;font-weight:800;font-size:.88rem;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+.ai-settings-body{padding:0 16px 16px;display:grid;gap:10px}
+.ai-settings label{display:grid;gap:5px;font-size:.78rem;font-weight:800;color:var(--text-primary)}
+.ai-settings input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-primary);font:inherit;font-weight:600;font-size:.86rem}
+.ai-settings .row{display:flex;gap:8px;flex-wrap:wrap}
+.ai-btn{border:1px solid var(--card-border);background:var(--card-bg);color:var(--text-primary);border-radius:10px;padding:9px 14px;font-weight:800;font-size:.8rem;cursor:pointer}
+.ai-btn.primary{background:var(--accent-green);border-color:var(--accent-green);color:#fff}
+.ai-btn:hover{border-color:var(--accent-green)}
+.ai-help{font-size:.74rem;color:var(--text-muted);line-height:1.5}
+.ai-help a{color:var(--accent-blue)}
+.ai-chat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:420px;max-height:calc(100vh - 360px)}
+.ai-stream{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+.ai-msg{display:flex;gap:10px;max-width:92%}
+.ai-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.ai-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-green-bg);color:var(--accent-green);font-size:.85rem}
+.ai-msg.user .ai-avatar{background:var(--accent-blue);color:#fff}
+.ai-bubble{background:var(--input-bg);border:1px solid var(--input-border);border-radius:14px;padding:10px 14px;font-size:.88rem;line-height:1.55;color:var(--text-primary)}
+.ai-msg.user .ai-bubble{background:var(--accent-green);border-color:var(--accent-green);color:#fff}
+.ai-bubble p{margin:0 0 6px}.ai-bubble p:last-child{margin:0}
+.ai-bubble ul{margin:4px 0 6px;padding-left:18px}
+.ai-results{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ai-result-chip{border:1px solid var(--accent-green);background:var(--accent-green-bg);color:var(--accent-green);border-radius:999px;padding:5px 11px;font-size:.74rem;font-weight:800;cursor:pointer}
+.ai-result-chip:hover{background:var(--accent-green);color:#fff}
+.ai-prompts{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px}
+.ai-prompt-btn{border:1px solid var(--card-border);background:var(--input-bg);color:var(--text-primary);border-radius:999px;padding:7px 13px;font-size:.78rem;font-weight:700;cursor:pointer}
+.ai-prompt-btn:hover{border-color:var(--accent-green);color:var(--accent-green)}
+.ai-inputbar{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--card-border)}
+.ai-inputbar input{flex:1;padding:11px 14px;border-radius:12px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text-primary);font:inherit;font-weight:600;font-size:.9rem;outline:none}
+.ai-inputbar input:focus{border-color:var(--accent-green)}
+.ai-send{border:none;background:var(--accent-green);color:#fff;border-radius:12px;padding:0 18px;font-weight:800;cursor:pointer}
+.ai-send:disabled{opacity:.6;cursor:wait}
+.ai-typing span{display:inline-block;width:6px;height:6px;margin-right:3px;border-radius:50%;background:var(--text-muted);animation:aiDot 1s infinite}
+.ai-typing span:nth-child(2){animation-delay:.15s}.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes aiDot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.ai-typing span{animation:none}}
+@media (max-width:760px){.nav-tab-btn{padding:8px 10px;font-size:.78rem}.brand-logo span{display:none}.jd-facts{grid-template-columns:1fr}}
+</style>
+
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-navbar">
+    <div class="brand-logo">
+      <i class="fa-solid fa-dna"></i>
+      <span>Paper Atlas Biotech</span>
+    </div>
+    
+    <div class="nav-center-group">
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="home-tab">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button class="nav-tab-btn" data-tab="map-tab">
+          <i class="fa-solid fa-map-location-dot"></i> Interactive Map
+        </button>
+        <button class="nav-tab-btn ai-tab" data-tab="ai-tab">
+          <i class="fa-solid fa-robot"></i> AI Assistant
+        </button>
+      </nav>
+
+      <button class="dark-toggle-btn" id="darkToggleBtn">
+        <span id="darkIcon">🌙</span> <span id="darkText">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="content-viewport">
+
+    <!-- ==================== TAB 1: HOME PAGE ==================== -->
+    <div id="home-tab" class="tab-view active">
+      
+      <section class="home-hero">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          <span>NJ Towns & US Biotech Directory</span>
+        </div>
+        <h1 class="hero-title">Find Biotech Roles & <span>Compare Commute Options</span></h1>
+        <p class="hero-subtitle">Type your starting location to calculate dynamic route travel times, distances, and costs across hundreds of sample positions nationwide.</p>
+        
+        <!-- User Origin Autocomplete Input -->
+        <div class="commute-origin-wrapper">
+          <div class="commute-origin-box">
+            <i class="fa-solid fa-location-dot" style="color: var(--accent-green); font-size: 1.1rem;"></i>
+            <input type="text" id="user-origin-input" value="Denville, NJ" placeholder="Type your US town/city (e.g. Denville, NJ, Newark, NJ, Boston, MA)..." autocomplete="off" />
+          </div>
+          <!-- Auto-complete Suggestions Dropdown Menu -->
+          <div class="autocomplete-dropdown" id="origin-suggestions"></div>
+        </div>
+
+        <div class="hero-cta-group">
+          <button class="btn-primary" onclick="switchTab('map-tab')">
+            <i class="fa-solid fa-map"></i> Open Interactive Map
+          </button>
+          <button class="btn-primary" style="background:var(--accent-blue);box-shadow:0 6px 20px rgba(37,99,235,.25);margin-left:8px" onclick="switchTab('ai-tab')">
+            <i class="fa-solid fa-robot"></i> Ask the AI Assistant
+          </button>
+        </div>
+      </section>
+
+      <!-- Category Filter Grid -->
+      <section class="home-section">
+        <div class="section-header">
+          <h2 class="section-title">Explore Pathway Types</h2>
+          <p class="section-subtitle">Click a category to filter locations on the map</p>
+        </div>
+
+        <div class="category-grid">
+          <div class="cat-card" onclick="openMapCategory('Job')">
+            <div class="cat-icon-box" style="background: var(--color-job-bg); color: var(--color-job-text);">💼</div>
+            <div class="cat-name">Jobs</div>
+          </div>
+          <div class="cat-card" onclick="openMapCategory('Internship')">
+            <div class="cat-icon-box" style="background: var(--color-intern-bg); color: var(--color-intern-text);">🧪</div>
+            <div class="cat-name">Internships</div>
+          </div>
+          <div class="cat-card" onclick="openMapCategory('University')">
+            <div class="cat-icon-box" style="background: var(--color-univ-bg); color: var(--color-univ-text);">🎓</div>
+            <div class="cat-name">Universities</div>
+          </div>
+          <div class="cat-card" onclick="openMapCategory('Certificate')">
+            <div class="cat-icon-box" style="background: var(--color-cert-bg); color: var(--color-cert-text);">📜</div>
+            <div class="cat-name">Certificates</div>
+          </div>
+          <div class="cat-card" onclick="openMapCategory('Summer')">
+            <div class="cat-icon-box" style="background: var(--color-summer-bg); color: var(--color-summer-text);">☀️</div>
+            <div class="cat-name">Summer Work</div>
+          </div>
+        </div>
+
+        <!-- Featured Positions Grid -->
+        <div class="section-header">
+          <h2 class="section-title">Featured Opportunities</h2>
+          <p class="section-subtitle">Click "Details & Commute" for full travel breakdowns</p>
+        </div>
+
+        <div class="featured-grid" id="featured-cards-container"></div>
+      </section>
+
+    </div>
+
+    <!-- ==================== TAB 2: INTERACTIVE MAP ==================== -->
+    <div id="map-tab" class="tab-view">
+      
+      <div class="map-overlay-card">
+        <div class="card-header-badge">
+          <span class="hero-badge" style="margin:0;"><span class="pulse-dot"></span> Directory</span>
+          <span class="active-count" id="pinCount">347 ACTIVE PINS</span>
+        </div>
+
+        <h1 style="font-size: 1.25rem; font-weight: 900; color: var(--text-primary);">USA Biotech Atlas 🧬</h1>
+
+        <div class="search-container">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search state, city, company, or job title...">
+          <button class="clear-btn" id="clearBtn">&times;</button>
+        </div>
+
+        <div class="filter-row">
+          <select id="categoryFilter" class="custom-select">
+            <option value="All">✨ All Categories (<!--n-->347 Pins)</option>
+            <option value="Job">💼 Jobs</option>
+            <option value="Internship">🧪 Internships</option>
+            <option value="University">🎓 Universities</option>
+            <option value="Certificate">📜 Certificates</option>
+            <option value="Summer">☀️ Summer Work</option>
+          </select>
+
+          <select id="expFilter" class="custom-select">
+            <option value="All">⚡ Experience</option>
+            <option value="Entry-Level">Entry-Level</option>
+            <option value="Mid-Level">Mid-Level</option>
+            <option value="Senior">Senior</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="map"></div>
+
+      <!-- Legend Panel -->
+      <div class="legend-panel">
+        <div class="legend-title">Categories Legend</div>
+        <div class="legend-items" aria-label="Filter map by opportunity category">
+          <button type="button" class="legend-badge atlas-type-pill" data-type="Job" aria-pressed="false">💼 Job</button>
+          <button type="button" class="legend-badge atlas-type-pill" data-type="Internship" aria-pressed="false">🧪 Internship</button>
+          <button type="button" class="legend-badge atlas-type-pill" data-type="University" aria-pressed="false">🎓 University</button>
+          <button type="button" class="legend-badge atlas-type-pill" data-type="Certificate" aria-pressed="false">📜 Certificate</button>
+          <button type="button" class="legend-badge atlas-type-pill" data-type="Summer" aria-pressed="false">☀️ Summer</button>
+          <button type="button" class="legend-badge atlas-type-pill active" data-type="All" aria-pressed="true">✨ All Pins</button>
+        </div>
+      </div>
+
+      <!-- Right Side Map Controls -->
+      <div class="controls-panel">
+        <button class="control-btn" onclick="atlasMapView('world')">🌐 Whole World</button>
+        <button class="control-btn" onclick="atlasMapView('usa')">USA Overview (50 States)</button>
+        <button class="control-btn" onclick="atlasMapView('denville')">📍 Denville, NJ</button>
+        <button class="control-btn" onclick="atlasMapView('in')">➕ Zoom In</button>
+        <button class="control-btn" onclick="atlasMapView('out')">➖ Zoom Out</button>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 3: AI ASSISTANT ==================== -->
+    <div id="ai-tab" class="tab-view">
+      <div class="ai-shell">
+        <div class="ai-head">
+          <div>
+            <h1>🤖 Paper Atlas AI Navigator</h1>
+            <p>Ask about biotech jobs, internships, certificates, universities, and summer programs. The assistant searches the listings on the map and can show any result on the map.</p>
+          </div>
+          <span class="ai-status" id="aiStatus"><span class="dot"></span><span id="aiStatusText">Offline mode</span></span>
+        </div>
+
+        
+
+        <div class="ai-chat">
+          <div class="ai-stream" id="aiStream" aria-live="polite"></div>
+          <div class="ai-prompts" id="aiPrompts">
+            <button type="button" class="ai-prompt-btn">Entry-level jobs near me</button>
+            <button type="button" class="ai-prompt-btn">Summer programs for high schoolers</button>
+            <button type="button" class="ai-prompt-btn">Certificates with no experience needed</button>
+            <button type="button" class="ai-prompt-btn">Universities in New Jersey</button>
+            <button type="button" class="ai-prompt-btn">Compare a job vs. a certificate</button>
+          </div>
+          <div class="ai-inputbar">
+            <input type="text" id="aiInput" placeholder="Ask about careers, pay, requirements, or locations..." autocomplete="off">
+            <button type="button" class="ai-send" id="aiSend"><i class="fa-solid fa-paper-plane"></i> Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Job Details & Commute Calculation Modal -->
+  <div class="modal-backdrop" id="job-modal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="close-modal-btn">&times;</button>
+      <span class="modal-badge" id="modal-category-pill">INTERNSHIP</span>
+      <h2 id="modal-position-title" style="font-size:1.3rem; margin-top:8px; font-weight:800;">Biotech Lab Specialist</h2>
+      <div class="modal-company" id="modal-company-name" style="color:var(--text-secondary); font-weight:700;">Denville Innovation Labs</div>
+      
+      <!-- Commute Breakdown Section -->
+      <div class="commute-section-title">
+        <i class="fa-solid fa-route" style="color: var(--accent-green);"></i>
+        <span>Commute Options from <span id="modal-origin-display" style="color:var(--accent-green);">Denville, NJ</span></span>
+      </div>
+
+      <div class="commute-cards-grid">
+        <!-- Drive -->
+        <div class="commute-mode-card" id="card-mode-drive">
+          <i class="fa-solid fa-car"></i>
+          <div class="commute-mode-name">Drive</div>
+          <div class="commute-mode-time" id="commute-drive-time">~15 mins</div>
+          <div class="commute-mode-cost" id="commute-drive-cost">~$2.50 Gas</div>
+          <div class="commute-mode-detail" id="commute-drive-dist">6 miles</div>
+        </div>
+
+        <!-- Bus/Train -->
+        <div class="commute-mode-card" id="card-mode-transit">
+          <i class="fa-solid fa-bus"></i>
+          <div class="commute-mode-name">Bus / Rail</div>
+          <div class="commute-mode-time" id="commute-transit-time">~25 mins</div>
+          <div class="commute-mode-cost" id="commute-transit-cost">$4.25 Fare</div>
+          <div class="commute-mode-detail" id="commute-transit-route">NJ Transit</div>
+        </div>
+
+        <!-- Flight -->
+        <div class="commute-mode-card" id="card-mode-flight">
+          <i class="fa-solid fa-plane"></i>
+          <div class="commute-mode-name">Flight</div>
+          <div class="commute-mode-time" id="commute-plane-time">N/A</div>
+          <div class="commute-mode-cost" id="commute-plane-cost">N/A</div>
+          <div class="commute-mode-detail" id="commute-plane-detail">Local Commute</div>
+        </div>
+      </div>
+
+      <a id="google-maps-route-btn" href="#" target="_blank" class="route-link-btn">
+        <i class="fa-solid fa-diamond-turn-right"></i> Open Directions in Google Maps
+      </a>
+
+      <div class="modal-body" style="margin-top: 18px;">
+        <h4 style="font-size:0.9rem; color:var(--text-primary); margin-bottom:8px;">Position summary</h4>
+        <div id="modal-description" class="job-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+
+  <!-- Unified fast-apply detail drawer from the cream/emerald map, adapted to the full site's pin data -->
+  <div id="atlasDrawerBackdrop" onclick="closeAtlasDrawer()" aria-hidden="true"></div>
+  <aside id="atlasDetailDrawer" role="dialog" aria-modal="true" aria-labelledby="atlasDrawerTitle">
+    <div class="atlas-drawer-head">
+      <div><span id="atlasDrawerType" class="atlas-drawer-type">OPPORTUNITY</span><h2 id="atlasDrawerTitle">Opportunity details</h2><p id="atlasDrawerCompany"></p></div>
+      <button type="button" class="atlas-drawer-close" onclick="closeAtlasDrawer()" aria-label="Close details">×</button>
+    </div>
+    <div class="atlas-drawer-body">
+      <div class="atlas-drawer-fact"><b>Location</b><span id="atlasDrawerLocation"></span></div>
+      <div class="atlas-drawer-fact"><b>Experience</b><span id="atlasDrawerExperience"></span></div>
+      <div class="atlas-drawer-fact"><b>Category</b><span id="atlasDrawerCategory"></span></div>
+      <p id="atlasDrawerDescription">Explore this biotech opportunity and review the commute details.</p>
+      <div id="atlasDrawerDetails" class="job-detail" style="margin-bottom:6px"></div>
+      <h3>Quick application</h3>
+      <p class="atlas-disclaimer">This demo form does not transmit an application to an employer. It validates your details locally and confirms the submission in this page.</p>
+      <form id="atlasFastApplyForm">
+        <label>Full name<input name="fullName" required autocomplete="name" placeholder="Your name"></label>
+        <label>Email address<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
+        <label>LinkedIn or portfolio URL <span>(optional)</span><input name="portfolio" type="url" placeholder="https://"></label>
+        <button type="submit" class="atlas-apply-submit">Submit express application</button>
+      </form>
+      <button type="button" class="atlas-commute-shortcut" id="atlasOpenCommute">Open commute breakdown</button>
+    </div>
+  </aside>
+  <div id="atlasToast" role="status" aria-live="polite"></div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      // Pre-mapped US Locations including expansive coverage of NJ Municipalities/Towns across all 21 Counties
+      const KNOWN_LOCATIONS = {
+        // Atlantic County
+        "absecon, nj": [39.4284, -74.4957], "atlantic city, nj": [39.3643, -74.4229], "brigantine, nj": [39.4101, -74.3646],
+        "buena, nj": [39.5226, -74.9221], "corbin city, nj": [39.2882, -74.7299], "egg harbor city, nj": [39.5276, -74.6468],
+        "egg harbor township, nj": [39.3888, -74.5950], "estell manor, nj": [39.3243, -74.7432], "folsom, nj": [39.5982, -74.8435],
+        "galloway, nj": [39.4976, -74.4827], "hamilton township, nj": [39.4500, -74.7167], "hammonton, nj": [39.6384, -74.8010],
+        "linwood, nj": [39.3396, -74.5771], "longport, nj": [39.3134, -74.5265], "margate city, nj": [39.3290, -74.5029],
+        "mullica township, nj": [39.5667, -74.6667], "northfield, nj": [39.3651, -74.5568], "pleasantville, nj": [39.3898, -74.5226],
+        "port republic, nj": [39.5284, -74.4849], "somers point, nj": [39.3129, -74.5982], "ventnor city, nj": [39.3387, -74.4782],
+        "weymouth township, nj": [39.4237, -74.7796],
+
+        // Bergen County
+        "allendale, nj": [41.0315, -74.1310], "alpine, nj": [40.9576, -73.9312], "bergenfield, nj": [40.9276, -74.0001],
+        "bogota, nj": [40.8745, -74.0290], "carlstadt, nj": [40.8354, -74.0754], "cliffside park, nj": [40.8218, -73.9876],
+        "closter, nj": [40.9734, -73.9615], "cresskill, nj": [40.9412, -73.9579], "demarest, nj": [40.9565, -73.9626],
+        "dumont, nj": [40.9409, -73.9974], "east rutherford, nj": [40.8337, -74.0971], "edgewater, nj": [40.8270, -73.9754],
+        "elmwood park, nj": [40.9015, -74.1182], "emerson, nj": [40.9765, -74.0263], "englewood, nj": [40.8929, -73.9726],
+        "englewood cliffs, nj": [40.8812, -73.9507], "fair lawn, nj": [40.9404, -74.1318], "fairview, nj": [40.8126, -74.0001],
+        "fort lee, nj": [40.8509, -73.9701], "franklin lakes, nj": [41.0182, -74.2057], "garfield, nj": [40.8812, -74.1132],
+        "glen rock, nj": [40.9626, -74.1324], "hackensack, nj": [40.8859, -74.0435], "harrington park, nj": [40.9829, -73.9679],
+        "hasbrouck heights, nj": [40.8584, -74.0754], "haworth, nj": [40.9634, -73.9868], "hillsdale, nj": [41.0023, -74.0410],
+        "ho-ho-kus, nj": [41.0001, -74.0988], "leonia, nj": [40.8651, -73.9893], "little ferry, nj": [40.8512, -74.0415],
+        "odi, nj": [40.8854, -74.0826], "lyndhurst, nj": [40.8115, -74.1246], "mahwah, nj": [41.0887, -74.1438],
+        "maywood, nj": [40.9001, -74.0626], "midland park, nj": [40.9901, -74.1401], "montvale, nj": [41.0465, -74.0426],
+        "moonachie, nj": [40.8407, -74.0588], "new milford, nj": [40.9326, -74.0201], "north arlington, nj": [40.7895, -74.1326],
+        "northvale, nj": [41.0101, -73.9482], "norwood, nj": [40.9984, -73.9593], "oakland, nj": [41.0318, -74.2388],
+        "old tappan, nj": [41.0098, -73.9860], "oradell, nj": [40.9576, -74.0304], "palisades park, nj": [40.8482, -73.9932],
+        "paramus, nj": [40.9445, -74.0754], "park ridge, nj": [41.0365, -74.0393], "ramsey, nj": [41.0573, -74.1424],
+        "ridgefield, nj": [40.8334, -74.0118], "ridgefield park, nj": [40.8557, -74.0207], "ridgewood, nj": [40.9793, -74.1165],
+        "river edge, nj": [40.9307, -74.0368], "river vale, nj": [41.0126, -74.0088], "rochelle park, nj": [40.9048, -74.0701],
+        "rockleigh, nj": [41.0112, -73.9396], "rutherford, nj": [40.8265, -74.1068], "saddle brook, nj": [40.8987, -74.0879],
+        "saddle river, nj": [41.0326, -74.0988], "south hackensack, nj": [40.8687, -74.0535], "teaneck, nj": [40.8918, -74.0126],
+        "tenafly, nj": [40.9254, -73.9638], "teterboro, nj": [40.8584, -74.0610], "upper saddle river, nj": [41.0601, -74.0926],
+        "waldwick, nj": [41.0134, -74.1193], "wallington, nj": [40.8529, -74.1188], "washington township, nj": [40.9926, -74.0626],
+        "westwood, nj": [40.9918, -74.0326], "wood-ridge, nj": [40.8465, -74.0868], "woodcliff lake, nj": [41.0226, -74.0526],
+        "wyckoff, nj": [41.0095, -74.1738],
+
+        // Burlington County
+        "bass river, nj": [39.6384, -74.4235], "beverly, nj": [40.0634, -74.9224], "bordentown, nj": [40.1465, -74.7118],
+        "burlington, nj": [40.0712, -74.8643], "chesterfield, nj": [40.1226, -74.6226], "cinnaminson, nj": [40.0001, -74.9926],
+        "delanco, nj": [40.0512, -74.9526], "delran, nj": [40.0226, -74.9626], "eastampton, nj": [39.9884, -74.7326],
+        "edgewater park, nj": [40.0526, -74.9126], "evesham, nj": [39.8626, -74.8926], "fieldsboro, nj": [40.1384, -74.7288],
+        "florence, nj": [40.1226, -74.8088], "hainesport, nj": [39.9826, -74.7626], "lumberton, nj": [39.9626, -74.8088],
+        "mansfield, nj": [40.0826, -74.6826], "mapleshade, nj": [39.9526, -74.9826], "medford, nj": [39.8926, -74.8226],
+        "medford lakes, nj": [39.8584, -74.8188], "moorestown, nj": [39.9688, -74.9488], "mount holly, nj": [39.9926, -74.7888],
+        "mount laurel, nj": [39.9326, -74.8888], "new hanover, nj": [40.0126, -74.5826], "north hanover, nj": [40.0626, -74.5526],
+        "palmyra, nj": [40.0026, -75.0288], "pemberton, nj": [39.9726, -74.6826], "riverside, nj": [40.0384, -74.9588],
+        "riverton, nj": [40.0126, -75.0126], "shamong, nj": [39.7926, -74.7388], "southampton, nj": [39.8926, -74.7188],
+        "springfield, nj": [40.0384, -74.6388], "tabernacle, nj": [39.8326, -74.7126], "washington, nj": [39.6884, -74.5888],
+        "westampton, nj": [40.0184, -74.8026], "willingboro, nj": [40.0284, -74.8726], "wrightstown, nj": [40.0384, -74.5988],
+
+        // Camden County
+        "audubon, nj": [39.8884, -75.0726], "audubon park, nj": [39.8942, -75.0818], "barrington, nj": [39.8684, -75.0488],
+        "bellmawr, nj": [39.8684, -75.0926], "berlin, nj": [39.7926, -74.9388], "brooklawn, nj": [39.8784, -75.1188],
+        "camden, nj": [39.9259, -75.1196], "cherry hill, nj": [39.9348, -75.0307], "chesilhurst, nj": [39.7384, -74.8826],
+        "clementon, nj": [39.8026, -75.0188], "collingswood, nj": [39.9184, -75.0718], "gibbsboro, nj": [39.8326, -74.9688],
+        "gloucester city, nj": [39.8926, -75.1188], "gloucester township, nj": [39.7884, -75.0488], "haddon heights, nj": [39.8784, -75.0626],
+        "haddon township, nj": [39.9084, -75.0588], "haddonfield, nj": [39.8984, -75.0326], "hi-nella, nj": [39.8284, -75.0126],
+        "laurel springs, nj": [39.8184, -75.0026], "lawnside, nj": [39.8684, -75.0288], "lindenwold, nj": [39.8284, -74.9988],
+        "magnolia, nj": [39.8584, -75.0388], "merchantville, nj": [39.9526, -75.0488], "mount ephraim, nj": [39.8826, -75.0926],
+        "oaklyn, nj": [39.9026, -75.0826], "pennsauken, nj": [39.9684, -75.0588], "pine hill, nj": [39.8026, -74.9888],
+        "pine valley, nj": [39.7826, -74.9826], "runnemede, nj": [39.8526, -75.0726], "somerdale, nj": [39.8426, -75.0226],
+        "stratford, nj": [39.8326, -75.0126], "tavistock, nj": [39.8826, -75.0326], "voorhees, nj": [39.8526, -74.9488],
+        "waterford, nj": [39.7326, -74.8388], "winslow, nj": [39.6926, -74.8988], "woodlynne, nj": [39.9184, -75.1026],
+
+        // Cape May County
+        "avalon, nj": [39.1026, -74.7288], "cape may, nj": [38.9351, -74.9060], "cape may point, nj": [38.9326, -74.9626],
+        "dennis township, nj": [39.1926, -74.8288], "lower township, nj": [38.9826, -74.9288], "middle township, nj": [39.1026, -74.8288],
+        "north wildwood, nj": [39.0026, -74.7988], "ocean city, nj": [39.2776, -74.5746], "sea isle city, nj": [39.1526, -74.6926],
+        "stone harbor, nj": [39.0526, -74.7588], "upper township, nj": [39.2326, -74.7188], "west cape may, nj": [38.9384, -74.9388],
+        "west wildwood, nj": [38.9926, -74.8226], "wildwood, nj": [38.9884, -74.8126], "wildwood crest, nj": [38.9726, -74.8388],
+        "woodbine, nj": [39.2384, -74.8126],
+
+        // Cumberland County
+        "bridgeton, nj": [39.4273, -75.2341], "commercial, nj": [39.2884, -75.0388], "deerfield, nj": [39.5184, -75.1988],
+        "downe, nj": [39.2784, -75.1588], "fairfield township, nj": [39.3884, -75.1988], "greenwich, nj": [39.3984, -75.3388],
+        "hopewell township, nj": [39.4584, -75.2588], "lawrence township, nj": [39.3284, -75.1288], "maurice river, nj": [39.2884, -74.9588],
+        "millville, nj": [39.4021, -75.0393], "shiloh, nj": [39.4584, -75.2988], "stow creek, nj": [39.4684, -75.3488],
+        "upper deerfield, nj": [39.4884, -75.2288], "vineland, nj": [39.4862, -75.0257],
+
+        // Essex County
+        "belleville, nj": [40.7937, -74.1501], "bloomfield, nj": [40.8068, -74.1854], "caldwell, nj": [40.8398, -74.2765],
+        "cedar grove, nj": [40.8526, -74.2288], "east orange, nj": [40.7673, -74.2049], "essex fells, nj": [40.8326, -74.2826],
+        "fairfield, nj": [40.8784, -74.2988], "glen ridge, nj": [40.8026, -74.2026], "irvington, nj": [40.7326, -74.2326],
+        "livingston, nj": [40.7926, -74.3188], "maplewood, nj": [40.7312, -74.2726], "millburn, nj": [40.7226, -74.3026],
+        "montclair, nj": [40.8259, -74.2090], "newark, nj": [40.7357, -74.1724], "north caldwell, nj": [40.8626, -74.2626],
+        "nutley, nj": [40.8223, -74.1599], "orange, nj": [40.7707, -74.2326], "roseland, nj": [40.8201, -74.2826],
+        "south orange, nj": [40.7484, -74.2612], "verona, nj": [40.8276, -74.2401], "west caldwell, nj": [40.8484, -74.2988],
+        "west orange, nj": [40.7984, -74.2388],
+
+        // Gloucester County
+        "clayton, nj": [39.6584, -75.0888], "deptford, nj": [39.8284, -75.1188], "east greenwich, nj": [39.8084, -75.2288],
+        "elk township, nj": [39.6884, -75.1488], "franklin township, nj": [39.6184, -75.0788], "glassboro, nj": [39.7029, -75.1118],
+        "greenwich township, nj": [39.8384, -75.2888], "harrison, nj": [39.7384, -75.1988], "logan, nj": [39.8084, -75.3388],
+        "mantua, nj": [39.7884, -75.1788], "monroe, nj": [39.6784, -74.9988], "national park, nj": [39.8684, -75.1788],
+        "newfield, nj": [39.5484, -75.0288], "paulsboro, nj": [39.8384, -75.2388], "pitman, nj": [39.7326, -75.1326],
+        "south harrison, nj": [39.6984, -75.2388], "swedesboro, nj": [39.7484, -75.3126], "washington township, nj": [39.7584, -75.0788],
+        "wenonah, nj": [39.7984, -75.1526], "west deptford, nj": [39.8484, -75.1888], "westville, nj": [39.8684, -75.1326],
+        "woodbury, nj": [39.8384, -75.1526], "woodbury heights, nj": [39.8212, -75.1512], "woolwich, nj": [39.7384, -75.3188],
+
+        // Hudson County
+        "bayonne, nj": [40.6687, -74.1143], "east newark, nj": [40.7526, -74.1588], "guttenberg, nj": [40.7926, -74.0026],
+        "harrison, nj": [40.7454, -74.1557], "hoboken, nj": [40.7440, -74.0324], "jersey city, nj": [40.7178, -74.0431],
+        "kearny, nj": [40.7684, -74.1488], "north bergen, nj": [40.7826, -74.0226], "secaucus, nj": [40.7895, -74.0565],
+        "union city, nj": [40.7795, -74.0246], "weehawken, nj": [40.7701, -74.0188], "west new york, nj": [40.7879, -74.0143],
+
+        // Hunterdon County
+        "alexandria, nj": [40.5884, -75.0388], "bethlehem, nj": [40.6384, -74.9888], "bloomsbury, nj": [40.6626, -75.0826],
+        "califon, nj": [40.7184, -74.8388], "clinton, nj": [40.6384, -74.9088], "clinton township, nj": [40.6384, -74.8688],
+        "delaware, nj": [40.4184, -74.9588], "east amwell, nj": [40.4384, -74.8388], "flemington, nj": [40.5126, -74.8588],
+        "franklin township, nj": [40.5484, -74.9388], "frenchtown, nj": [40.5284, -75.0588], "glen gardner, nj": [40.7026, -74.9488],
+        "hampton, nj": [40.7026, -74.9588], "high bridge, nj": [40.6684, -74.8988], "holland, nj": [40.5884, -75.1188],
+        "kingwood, nj": [40.5084, -75.0188], "lambertville, nj": [40.3684, -74.9426], "lebanon borough, nj": [40.6426, -74.8326],
+        "lebanon township, nj": [40.7384, -74.8688], "milford, nj": [40.5684, -75.0926], "raritan, nj": [40.5184, -74.8188],
+        "readington, nj": [40.5684, -74.7388], "stockton, nj": [40.4026, -74.9826], "tewksbury, nj": [40.6984, -74.7688],
+        "union township, nj": [40.6184, -74.9888], "west amwell, nj": [40.3884, -74.8888],
+
+        // Mercer County
+        "east windsor, nj": [40.2684, -74.5288], "ewing, nj": [40.2684, -74.7988], "hamilton, nj": [40.2284, -74.6888],
+        "hightstown, nj": [40.2684, -74.5226], "hopewell, nj": [40.3884, -74.7588], "hopewell township, nj": [40.3384, -74.8188],
+        "lawrence, nj": [40.2984, -74.7388], "pennington, nj": [40.3226, -74.7926], "princeton, nj": [40.3573, -74.6672],
+        "robbinsville, nj": [40.2184, -74.6188], "trenton, nj": [40.2206, -74.7597], "west windsor, nj": [40.3184, -74.6188],
+
+        // Middlesex County
+        "carteret, nj": [40.5784, -74.2288], "cranbury, nj": [40.3126, -74.5126], "dunellen, nj": [40.5926, -74.4626],
+        "east brunswick, nj": [40.4284, -74.4188], "edison, nj": [40.5187, -74.4121], "helmetta, nj": [40.3826, -74.4226], "highland park, nj": [40.4984, -74.4226],
+        "jamesburg, nj": [40.3526, -74.4388], "metuchen, nj": [40.5426, -74.3626], "middlesex, nj": [40.5784, -74.4988],
+        "milltown, nj": [40.4526, -74.4388], "monroe township, nj": [40.3284, -74.4388], "new brunswick, nj": [40.4862, -74.4518],
+        "north brunswick, nj": [40.4584, -74.4788], "old bridge, nj": [40.4084, -74.3388], "perth amboy, nj": [40.5068, -74.2654],
+        "piscataway, nj": [40.5549, -74.4601], "plainsboro, nj": [40.3326, -74.5826], "sayreville, nj": [40.4584, -74.3588],
+        "south amboy, nj": [40.4826, -74.2826], "south brunswick, nj": [40.3784, -74.5288], "south plainfield, nj": [40.5784, -74.4188],
+        "south river, nj": [40.4484, -74.3888], "spotswood, nj": [40.3926, -74.3926], "woodbridge, nj": [40.5576, -74.2846],
+
+        // Monmouth County
+        "allenhurst, nj": [40.2384, -74.0026], "allentown, nj": [40.1826, -74.5826], "asbury park, nj": [40.2204, -74.0121],
+        "atlantic highlands, nj": [40.4126, -74.0326], "avon-by-the-sea, nj": [40.1926, -74.0188], "belmar, nj": [40.1784, -74.0226],
+        "bradley beach, nj": [40.2026, -74.0126], "brielle, nj": [40.1084, -74.0588], "colts neck, nj": [40.2884, -74.1788],
+        "deal, nj": [40.2484, -73.9988], "eatontown, nj": [40.2984, -74.0588], "englishtown, nj": [40.2984, -74.3588],
+        "fair haven, nj": [40.3584, -74.0388], "farmingdale, nj": [40.1984, -74.1688], "freehold borough, nj": [40.2601, -74.2776],
+        "freehold township, nj": [40.2384, -74.2788], "hazlet, nj": [40.4184, -74.1788], "holmdel, nj": [40.3584, -74.1788],
+        "howell, nj": [40.1784, -74.2288], "interlaken, nj": [40.2326, -74.0126], "keansburg, nj": [40.4426, -74.1326],
+        "keyport, nj": [40.4326, -74.2026], "lake como, nj": [40.1726, -74.0226], "little silver, nj": [40.3326, -74.0388],
+        "loch arbour, nj": [40.2384, -73.9988], "long branch, nj": [40.3043, -73.9924], "manalapan, nj": [40.2884, -74.3388],
+        "manasquan, nj": [40.1226, -74.0526], "marlboro, nj": [40.3184, -74.2488], "matawan, nj": [40.4184, -74.2288],
+        "middletown, nj": [40.3984, -74.1188], "millstone, nj": [40.2084, -74.4188], "monmouth beach, nj": [40.3326, -73.9826],
+        "neptune borough, nj": [40.2184, -74.0388], "neptune township, nj": [40.2084, -74.0488], "ocean township, nj": [40.2384, -74.0488],
+        "oceanport, nj": [40.3184, -74.0288], "hazlet, nj": [40.4184, -74.1788], "red bank, nj": [40.3471, -74.0643],
+        "roosevelt, nj": [40.2184, -74.4788], "rumson, nj": [40.3684, -73.9988], "sea bright, nj": [40.3626, -73.9726],
+        "sea girt, nj": [40.1326, -74.0388], "shrewsbury, nj": [40.3284, -74.0588], "spring lake, nj": [40.1526, -74.0326],
+        "spring lake heights, nj": [40.1484, -74.0388], "tinton falls, nj": [40.2784, -74.0888], "union beach, nj": [40.4484, -74.1788],
+        "upper freehold, nj": [40.1384, -74.4788], "wall township, nj": [40.1584, -74.0888], "west long branch, nj": [40.2884, -74.0188],
+
+        // Morris County
+        "boonton, nj": [40.9026, -74.4088], "boonton township, nj": [40.9284, -74.4188], "butler, nj": [41.0026, -74.3426],
+        "chatham borough, nj": [40.7409, -74.3832], "chatham township, nj": [40.7184, -74.3988], "chester borough, nj": [40.7842, -74.6968],
+        "chester township, nj": [40.7784, -74.6888], "denville, nj": [40.8923, -74.4774], "dover, nj": [40.8843, -74.5588],
+        "east hanover, nj": [40.8184, -74.3688], "florham park, nj": [40.7884, -74.3888], "hanover, nj": [40.8184, -74.4188],
+        "harding, nj": [40.7484, -74.4888], "jefferson township, nj": [41.0184, -74.5688], "kinnelon, nj": [40.9984, -74.3888],
+        "lincoln park, nj": [40.9226, -74.3026], "long hill, nj": [40.6884, -74.4888], "madison, nj": [40.7598, -74.4171],
+        "mendham borough, nj": [40.7784, -74.6026], "mendham township, nj": [40.7884, -74.5888], "mine hill, nj": [40.8884, -74.5888],
+        "montville, nj": [40.9184, -74.3588], "morris plains, nj": [40.8620, -74.4250], "morris township, nj": [40.7884, -74.4988],
+        "morristown, nj": [40.7968, -74.4815], "mount arlington, nj": [40.9226, -74.6326], "mount olive, nj": [40.8684, -74.7188],
+        "mountain lakes, nj": [40.8926, -74.4326], "netcong, nj": [40.8984, -74.7026], "parsippany, nj": [40.8410, -74.4180],
+        "pequannock, nj": [40.9684, -74.2988], "randolph, nj": [40.8484, -74.5788], "riverdale, nj": [41.0026, -74.3126],
+        "rockaway borough, nj": [40.9026, -74.5126], "rockaway township, nj": [40.9384, -74.5188], "roxbury, nj": [40.8884, -74.6588],
+        "victory gardens, nj": [40.8884, -74.5288], "washington township, nj": [40.7784, -74.7888], "wharton, nj": [40.8926, -74.5826],
+
+        // Ocean County
+        "barnegat, nj": [39.7584, -74.2188], "barnegat light, nj": [39.7584, -74.1026], "bay head, nj": [40.0726, -74.0426],
+        "beach haven, nj": [39.5626, -74.2426], "beachwood, nj": [39.9284, -74.1988], "berkeley, nj": [39.8884, -74.2188],
+        "brick, nj": [40.0584, -74.1388], "eagleswood, nj": [39.6384, -74.2888], "harvey cedars, nj": [39.7026, -74.1388],
+        "island heights, nj": [39.9426, -74.1426], "jackson, nj": [40.0984, -74.3588], "lacey, nj": [39.8684, -74.2588],
+        "lakehurst, nj": [40.0126, -74.3126], "lakewood, nj": [40.0971, -74.2177], "lavallette, nj": [39.9726, -74.0726],
+        "little egg harbor, nj": [39.6184, -74.3288], "long beach township, nj": [39.6384, -74.1788], "manahawkin, nj": [39.6984, -74.2588],
+        "mantoloking, nj": [40.0384, -74.0526], "ocean township, nj": [39.7884, -74.1888], "ocean gate, nj": [39.9326, -74.1326],
+        "pine beach, nj": [39.9384, -74.1688], "plumsted, nj": [40.0684, -74.4588], "point pleasant, nj": [40.0826, -74.0688],
+        "point pleasant beach, nj": [40.0926, -74.0488], "seabright, nj": [39.9784, -74.0788], "seaside heights, nj": [39.9426, -74.0726],
+        "seaside park, nj": [39.9284, -74.0788], "ship bottom, nj": [39.6484, -74.1826], "south tombs river, nj": [39.9426, -74.1926],
+        "stafford, nj": [39.6984, -74.2888], "surf city, nj": [39.6626, -74.1688], "toms river, nj": [39.9537, -74.1979],
+        "tuckerton, nj": [39.6026, -74.3426],
+
+        // Passaic County
+        "bloomingdale, nj": [41.0326, -74.3326], "clifton, nj": [40.8584, -74.1638], "haledon, nj": [40.9326, -74.1826],
+        "hawthorne, nj": [40.9526, -74.1526], "little falls, nj": [40.8784, -74.2188], "north haledon, nj": [40.9584, -74.1888],
+        "passaic, nj": [40.8568, -74.1285], "paterson, nj": [40.9168, -74.1718], "pompton lakes, nj": [41.0026, -74.2826],
+        "prospect park, nj": [40.9384, -74.1688], "ringwood, nj": [41.1184, -74.2488], "totowa, nj": [40.8984, -74.2188],
+        "wanaque, nj": [41.0384, -74.2988], "wayne, nj": [40.9254, -74.2765], "west milford, nj": [41.1284, -74.3688],
+        "woodland park, nj": [40.8884, -74.1988],
+
+        // Salem County
+        "alloway, nj": [39.5684, -75.3588], "carneys point, nj": [39.7084, -75.4688], "elmer, nj": [39.5926, -75.1726],
+        "elsinboro, nj": [39.5384, -75.4888], "lower allows creek, nj": [39.4684, -75.4888], "mannington, nj": [39.5884, -75.4288],
+        "oldmans, nj": [39.7384, -75.4388], "penns grove, nj": [39.7226, -75.4626], "pennsville, nj": [39.6584, -75.5088],
+        "pilesgrove, nj": [39.6484, -75.3888], "pittsgrove, nj": [39.5884, -75.1588], "quinton, nj": [39.5484, -75.4088],
+        "salem, nj": [39.5726, -75.4688], "upper pittsgrove, nj": [39.6384, -75.2288], "woodstown, nj": [39.6526, -75.3288],
+
+        // Somerset County
+        "bedminster, nj": [40.6784, -74.6488], "bernards township, nj": [40.6584, -74.5888], "bernardsville, nj": [40.7184, -74.5688],
+        "bound brook, nj": [40.5626, -74.5326], "branchburg, nj": [40.5684, -74.6988], "bridgewater, nj": [40.5926, -74.6288],
+        "far hills, nj": [40.6884, -74.6288], "franklin, nj": [40.4884, -74.5188], "green brook, nj": [40.6184, -74.4888],
+        "hillsborough, nj": [40.5084, -74.6388], "manville, nj": [40.5426, -74.5826], "millstone borough, nj": [40.5026, -74.5888],
+        "montgomery, nj": [40.4384, -74.6688], "north plainfield, nj": [40.6126, -74.4388], "peapack-gladstone, nj": [40.7184, -74.6588],
+        "raritan borough, nj": [40.5684, -74.6388], "rocky hill, nj": [40.3984, -74.6388], "somerville, nj": [40.5726, -74.6126],
+        "south bound brook, nj": [40.5526, -74.5288], "warren, nj": [40.6384, -74.5188], "watchung, nj": [40.6384, -74.4588],
+
+        // Sussex County
+        "andover borough, nj": [40.9826, -74.7426], "andover township, nj": [40.9884, -74.7288], "branchville, nj": [41.1484, -74.7526],
+        "byram, nj": [40.9484, -74.7088], "frankford, nj": [41.1584, -74.7388], "franklin borough, nj": [41.1184, -74.5888],
+        "fredon, nj": [41.0384, -74.8088], "green township, nj": [40.9684, -74.8188], "hamburg, nj": [41.1526, -74.5726],
+        "hampton township, nj": [41.1084, -74.7888], "hardyston, nj": [41.1384, -74.5588], "hopatcong, nj": [40.9384, -74.6688],
+        "lafayette, nj": [41.1084, -74.6888], "montague, nj": [41.2984, -74.7788], "newton, nj": [41.0584, -74.7526], "ogdensburg, nj": [41.0826, -74.5926],
+        "sandyston, nj": [41.1884, -74.8388], "sparta, nj": [41.0384, -74.6388], "stanhope, nj": [40.9084, -74.7088],
+        "stillwater, nj": [41.0384, -74.8888], "sussex borough, nj": [41.2084, -74.6026], "vernon, nj": [41.1984, -74.4888],
+        "walpack, nj": [41.1584, -74.8888], "wantage, nj": [41.2484, -74.6188],
+
+        // Union County
+        "berkeley heights, nj": [40.6884, -74.4388], "clark, nj": [40.6384, -74.3188], "cranford, nj": [40.6584, -74.3026], "elizabeth, nj": [40.6639, -74.2107],
+        "fanwood, nj": [40.6426, -74.3826], "garwood, nj": [40.6526, -74.3226], "hillside, nj": [40.6984, -74.2288],
+        "linden, nj": [40.6226, -74.2488], "mountainside, nj": [40.6684, -74.3688], "new providence, nj": [40.6984, -74.4088],
+        "plainfield, nj": [40.6184, -74.4188], "rahway, nj": [40.6084, -74.2788], "roselle, nj": [40.6526, -74.2588],
+        "roselle park, nj": [40.6684, -74.2688], "scotch plains, nj": [40.6584, -74.3888], "springfield, nj": [40.7084, -74.3188],
+        "summit, nj": [40.7171, -74.3575], "union, nj": [40.6984, -74.2688], "westfield, nj": [40.6584, -74.3488],
+        "winfield, nj": [40.6384, -74.2888],
+
+        // Warren County
+        "allamuchy, nj": [40.9284, -74.8188], "alpha, nj": [40.6626, -75.1588], "belvidere, nj": [40.8284, -75.0788],
+        "blairstown, nj": [40.9826, -74.9588], "franklin township, nj": [40.7584, -75.0088], "frelinghuysen, nj": [40.9584, -74.8888],
+        "greenwich, nj": [40.6884, -75.1288], "hackettstown, nj": [40.8526, -74.8288], "hardwick, nj": [41.0184, -74.9388],
+        "harmony, nj": [40.7584, -75.1188], "hope, nj": [40.9126, -74.9626], "independence, nj": [40.8884, -74.8588],
+        "knowlton, nj": [40.9284, -75.0588], "liberty, nj": [40.8884, -74.9188], "lopatcong, nj": [40.6984, -75.1588],
+        "mansfield, nj": [40.8084, -74.8988], "oxford, nj": [40.8084, -74.9988], "phillipsburg, nj": [40.6926, -75.1888],
+        "pohatcong, nj": [40.6584, -75.1788], "washington borough, nj": [40.7584, -74.9788], "washington township, nj": [40.7484, -74.9588],
+        "white township, nj": [40.8284, -75.0188],
+
+        // Other Key US Biotech Cities
+        "new york, ny": [40.7128, -74.0060], "boston, ma": [42.3601, -71.0589], "cambridge, ma": [42.3736, -71.1097],
+        "philadelphia, pa": [39.9526, -75.1652], "pittsburgh, pa": [40.4406, -79.9959], "washington, dc": [38.9072, -77.0369],
+        "baltimore, md": [39.2904, -76.6122], "raleigh, nc": [35.7796, -78.6382], "durham, nc": [35.9940, -78.8986],
+        "charlotte, nc": [35.2271, -80.8431], "atlanta, ga": [33.7490, -84.3880], "miami, fl": [25.7617, -80.1918],
+        "tampa, fl": [27.9506, -82.4572], "chicago, il": [41.8781, -87.6298], "madison, wi": [43.0731, -89.4012],
+        "minneapolis, mn": [44.9778, -93.2650], "st. paul, mn": [44.9537, -93.0900], "st. louis, mo": [38.6270, -90.1994],
+        "indianapolis, in": [39.7684, -86.1581], "dallas, tx": [32.7767, -96.7970], "houston, tx": [29.7604, -95.3698],
+        "austin, tx": [30.2672, -97.7431], "san antonio, tx": [29.4241, -98.4936], "denver, co": [39.7392, -104.9903],
+        "boulder, co": [40.0150, -105.2705], "salt lake city, ut": [40.7608, -111.8910], "phoenix, az": [33.4484, -112.0740],
+        "tucson, az": [32.2226, -110.9747], "las vegas, nv": [36.1699, -115.1398], "reno, nv": [39.5296, -119.8138],
+        "seattle, wa": [47.6062, -122.3321], "portland, or": [45.5152, -122.6784], "san francisco, ca": [37.7749, -122.4194],
+        "south san francisco, ca": [37.6547, -122.4077], "palo alto, ca": [37.4419, -122.1430], "berkeley, ca": [37.8715, -122.2730],
+        "los angeles, ca": [34.0522, -118.2437], "san diego, ca": [32.7157, -117.1611], "la jolla, ca": [32.8328, -117.2713]
+      };
+
+      // Helper function to capitalize each word cleanly (e.g. san francisco -> San Francisco)
+      function toProperCase(str) {
+        return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+      }
+
+      // Format town list for clean UI display
+      const US_TOWNS = Object.keys(KNOWN_LOCATIONS).map(k => {
+        const parts = k.split(',');
+        if (parts.length > 1) {
+          return `${toProperCase(parts[0].trim())}, ${parts[1].trim().toUpperCase()}`;
+        }
+        return toProperCase(k);
+      });
+
+      // Biotech pins dataset. Coordinates were re-anchored to real land locations (campuses / business districts).
+      // NOTE: these are SAMPLE listings for a school project, not live job postings.
+      const pinData = [{"id":1,"title":"Diabetes Care Drug Discovery","company":"Eli Lilly","city":"Indianapolis","state":"IN","lat":39.76221,"lng":-86.17296,"category":"Job","experience":"Senior"},{"id":2,"title":"Stem Cell Research Scientist","company":"UW-Madison Stem Cell Center","city":"Madison","state":"WI","lat":43.07827,"lng":-89.41352,"category":"University","experience":"Senior"},{"id":3,"title":"Infectious Disease Research Lead","company":"Texas Biomed","city":"San Antonio","state":"TX","lat":29.50607,"lng":-98.5739,"category":"Job","experience":"Senior"},{"id":4,"title":"Biomedical Sciences Researcher","company":"Univ of North Dakota","city":"Grand Forks","state":"ND","lat":47.92571,"lng":-97.07594,"category":"University","experience":"Mid-Level"},{"id":5,"title":"Biotechnology Institute Lead","company":"Univ of Minnesota","city":"St. Paul","state":"MN","lat":44.98914,"lng":-93.18074,"category":"University","experience":"Mid-Level"},{"id":6,"title":"Pharmaceutical Sciences Scholar","company":"WSU Health Sciences","city":"Spokane","state":"WA","lat":47.63486,"lng":-117.41089,"category":"University","experience":"Entry-Level"},{"id":8,"title":"Cardiovascular Medical Device Lead","company":"Medtronic Bio","city":"Minneapolis","state":"MN","lat":44.97326,"lng":-93.22881,"category":"Job","experience":"Senior"},{"id":9,"title":"High-Throughput Screening Specialist","company":"Recursion Pharma","city":"Salt Lake City","state":"UT","lat":40.76577,"lng":-111.84063,"category":"Job","experience":"Mid-Level"},{"id":10,"title":"Bioinformatics Summer Intern","company":"Boise State Biotech","city":"Boise","state":"ID","lat":43.60366,"lng":-116.2007,"category":"Summer","experience":"Entry-Level"},{"id":11,"title":"Cellular Therapy Specialist","company":"MD Anderson","city":"Houston","state":"TX","lat":29.70754,"lng":-95.39637,"category":"Job","experience":"Senior"},{"id":12,"title":"mRNA Bioprocess Associate","company":"Aldevron","city":"Fargo","state":"ND","lat":46.89706,"lng":-96.80472,"category":"Job","experience":"Entry-Level"},{"id":14,"title":"RNA Chemistry Specialist","company":"Thermo Fisher Scientific","city":"Boulder","state":"CO","lat":40.00752,"lng":-105.26599,"category":"Job","experience":"Mid-Level"},{"id":16,"title":"Veterinary Diagnostics Research","company":"IDEXX Laboratories","city":"Portland","state":"ME","lat":43.65096,"lng":-70.27476,"category":"Job","experience":"Senior"},{"id":17,"title":"Precision Medicine Fellow","company":"Univ of Michigan Health","city":"Ann Arbor","state":"MI","lat":42.28494,"lng":-83.72702,"category":"Job","experience":"Entry-Level"},{"id":19,"title":"Oncology Lab Scientist","company":"Amgen","city":"Los Angeles","state":"CA","lat":34.06927,"lng":-118.44551,"category":"Job","experience":"Mid-Level"},{"id":20,"title":"Marine Biotechnology Intern","company":"Univ of Miami Rosenstiel","city":"Miami","state":"FL","lat":25.79142,"lng":-80.21326,"category":"Summer","experience":"Entry-Level"},{"id":21,"title":"Clinical Trials Coordinator Intern","company":"Nevada Bio","city":"Las Vegas","state":"NV","lat":36.109,"lng":-115.1422,"category":"Summer","experience":"Entry-Level"},{"id":22,"title":"Bio-defense Technology Analyst","company":"Sandia Bio Labs","city":"Albuquerque","state":"NM","lat":35.08525,"lng":-106.61883,"category":"Job","experience":"Senior"},{"id":23,"title":"Gene Therapy Process Engineer","company":"Novartis Gene Therapies","city":"Research Triangle","state":"NC","lat":35.90051,"lng":-78.86399,"category":"Job","experience":"Senior"},{"id":24,"title":"Genomics Lab Intern","company":"UC Berkeley Labs","city":"Berkeley","state":"CA","lat":37.8732,"lng":-122.25839,"category":"Internship","experience":"Entry-Level"},{"id":27,"title":"Cell & Gene Therapy Lead","company":"Spark Therapeutics","city":"Philadelphia","state":"PA","lat":39.95383,"lng":-75.19463,"category":"Job","experience":"Senior"},{"id":28,"title":"Computational Biology Lead","company":"Asimov TX","city":"Austin","state":"TX","lat":30.28623,"lng":-97.73351,"category":"Job","experience":"Mid-Level"},{"id":29,"title":"Translational Research Postdoc","company":"NIH","city":"Bethesda","state":"MD","lat":38.99955,"lng":-77.10394,"category":"Job","experience":"Entry-Level"},{"id":30,"title":"Enzyme Technology Lead","company":"Sigma-Aldrich","city":"Milwaukee","state":"WI","lat":43.03531,"lng":-87.92701,"category":"Job","experience":"Mid-Level"},{"id":31,"title":"Summer Biotech Fellow","company":"UC Davis Health","city":"Sacramento","state":"CA","lat":38.55223,"lng":-121.4551,"category":"Summer","experience":"Entry-Level"},{"id":34,"title":"Plant Biotechnology Research","company":"Univ of Arizona","city":"Tucson","state":"AZ","lat":32.23241,"lng":-110.94833,"category":"University","experience":"Entry-Level"},{"id":37,"title":"Agricultural Biotech Lead","company":"AgBio Solutions","city":"Fresno","state":"CA","lat":36.8105,"lng":-119.74571,"category":"Job","experience":"Senior"},{"id":39,"title":"Cell Therapy Engineer","company":"Seagen / Pfizer","city":"Bothell","state":"WA","lat":47.75985,"lng":-122.19137,"category":"Job","experience":"Mid-Level"},{"id":41,"title":"Pharma Quality Specialist","company":"Denville BioPharma","city":"Denville","state":"NJ","lat":40.89083,"lng":-74.47769,"category":"Certificate","experience":"Entry-Level"},{"id":45,"title":"Proteomics Research Scientist","company":"SomaLogic","city":"Denver","state":"CO","lat":39.75109,"lng":-104.9944,"category":"Job","experience":"Senior"},{"id":46,"title":"Neuroscience Lab Assistant","company":"Univ of Oregon","city":"Eugene","state":"OR","lat":44.04307,"lng":-123.07347,"category":"Internship","experience":"Entry-Level"},{"id":130,"title":"Biomanufacturing Process Tech","company":"Denville Innovation BioLabs","city":"Denville","state":"NJ","lat":40.88641,"lng":-74.46832,"category":"Job","experience":"Entry-Level"},{"id":286,"title":"Summer Environmental Lab Aide","company":"Parsippany Bio","city":"Parsippany","state":"NJ","lat":40.84165,"lng":-74.42006,"category":"Summer","experience":"Entry-Level"},{"id":1001,"title":"Biomedical Innovation Fellow","company":"UT Southwestern","city":"Dallas","state":"TX","lat":32.81111,"lng":-96.83894,"category":"University","experience":"Entry-Level"},{"id":1004,"title":"mRNA Therapeutics Scientist","company":"Moderna","city":"Cambridge","state":"MA","lat":42.36418,"lng":-71.08307,"category":"Job","experience":"Senior"},{"id":1007,"title":"Bioprocess Tech Associate","company":"Edwards Lifesciences","city":"Irvine","state":"CA","lat":33.64166,"lng":-117.84498,"category":"Certificate","experience":"Entry-Level"},{"id":1008,"title":"Biomedical Data Engineer","company":"CDC BioHub","city":"Atlanta","state":"GA","lat":33.79771,"lng":-84.32639,"category":"Job","experience":"Mid-Level"},{"id":1010,"title":"Environmental Biotech Analyst","company":"Green Mountain Bio","city":"Burlington","state":"VT","lat":44.47722,"lng":-73.19408,"category":"Job","experience":"Mid-Level"},{"id":1014,"title":"Biomanufacturing Quality Lead","company":"Biogen","city":"Raleigh","state":"NC","lat":35.78346,"lng":-78.68378,"category":"Job","experience":"Mid-Level"},{"id":1017,"title":"Synthetic Biology Associate","company":"Sierra BioWorks","city":"Reno","state":"NV","lat":39.54461,"lng":-119.81658,"category":"Job","experience":"Entry-Level"},{"id":1032,"title":"Senior Scientist - Gene Therapy","company":"Genentech","city":"South San Francisco","state":"CA","lat":37.65451,"lng":-122.40652,"category":"Job","experience":"Senior"},{"id":1033,"title":"AgBiotech Genome Editing","company":"Bayer Crop Science","city":"St. Louis","state":"MO","lat":38.63521,"lng":-90.26435,"category":"Job","experience":"Senior"},{"id":1039,"title":"Genomics Clinical Analyst","company":"TGen / City of Hope","city":"Phoenix","state":"AZ","lat":33.46213,"lng":-112.03916,"category":"Job","experience":"Mid-Level"},{"id":1053,"title":"Clinical Trial Coordinator","company":"St. Louis Biotech Corp","city":"St. Louis","state":"MO","lat":38.64189,"lng":-90.26036,"category":"Job","experience":"Mid-Level"},{"id":1054,"title":"Summer Biomanufacturing Trainee","company":"San Antonio Biotech Corp","city":"San Antonio","state":"TX","lat":29.3739,"lng":-98.43825,"category":"Summer","experience":"Senior"},{"id":1055,"title":"Clinical Operations Lead","company":"Boise Biotech Corp","city":"Boise","state":"ID","lat":43.63573,"lng":-116.19905,"category":"Job","experience":"Senior"},{"id":1056,"title":"Bioinformatics Analyst","company":"Denville Biotech Corp","city":"Denville","state":"NJ","lat":40.90076,"lng":-74.46804,"category":"Job","experience":"Mid-Level"},{"id":1057,"title":"Laboratory Technician","company":"Palo Alto Biotech Corp","city":"Palo Alto","state":"CA","lat":37.41322,"lng":-122.15816,"category":"Job","experience":"Entry-Level"},{"id":1058,"title":"Process Development Associate","company":"San Francisco Biotech Corp","city":"San Francisco","state":"CA","lat":37.77846,"lng":-122.46123,"category":"Job","experience":"Mid-Level"},{"id":1059,"title":"Quality Control Intern","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.98349,"lng":-93.27624,"category":"Internship","experience":"Senior"},{"id":1060,"title":"B.S. in Biotechnology","company":"Houston Biotech Institute","city":"Houston","state":"TX","lat":29.77967,"lng":-95.39094,"category":"University","experience":"Entry-Level"},{"id":1061,"title":"Senior Bioprocess Engineer","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.72238,"lng":-111.85663,"category":"Job","experience":"Senior"},{"id":1062,"title":"Clinical Operations Lead","company":"Raleigh Biotech Corp","city":"Raleigh","state":"NC","lat":35.83499,"lng":-78.64199,"category":"Job","experience":"Senior"},{"id":1063,"title":"Summer Field Sampling Aide","company":"Bothell Biotech Corp","city":"Bothell","state":"WA","lat":47.76007,"lng":-122.19304,"category":"Summer","experience":"Entry-Level"},{"id":1064,"title":"Bioinformatics Intern","company":"Phoenix Biotech Corp","city":"Phoenix","state":"AZ","lat":33.4521,"lng":-112.0667,"category":"Internship","experience":"Senior"},{"id":1065,"title":"B.S. in Biomedical Sciences","company":"Atlanta Biotech Institute","city":"Atlanta","state":"GA","lat":33.78057,"lng":-84.38414,"category":"University","experience":"Entry-Level"},{"id":1066,"title":"QC Lab Analyst I","company":"Bethesda Biotech Corp","city":"Bethesda","state":"MD","lat":38.9846,"lng":-77.09451,"category":"Job","experience":"Entry-Level"},{"id":1067,"title":"Clinical Research Intern","company":"San Antonio Biotech Corp","city":"San Antonio","state":"TX","lat":29.61941,"lng":-98.48902,"category":"Internship","experience":"Senior"},{"id":1068,"title":"Assay Development Scientist","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.01704,"lng":-105.23944,"category":"Job","experience":"Mid-Level"},{"id":1069,"title":"Summer Biomanufacturing Trainee","company":"Bothell Biotech Corp","city":"Bothell","state":"WA","lat":47.78165,"lng":-122.1991,"category":"Summer","experience":"Mid-Level"},{"id":1070,"title":"Bioinformatics Intern","company":"Grand Forks Biotech Corp","city":"Grand Forks","state":"ND","lat":47.90838,"lng":-97.06915,"category":"Internship","experience":"Mid-Level"},{"id":1071,"title":"Laboratory Technician","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.81206,"lng":-119.74638,"category":"Job","experience":"Entry-Level"},{"id":1072,"title":"Manufacturing Intern","company":"Portland Biotech Corp","city":"Portland","state":"OR","lat":45.52885,"lng":-122.66026,"category":"Internship","experience":"Senior"},{"id":1073,"title":"Summer Field Sampling Aide","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.90981,"lng":-93.17032,"category":"Summer","experience":"Senior"},{"id":1074,"title":"Clinical Trial Coordinator","company":"Bothell Biotech Corp","city":"Bothell","state":"WA","lat":47.79145,"lng":-122.20619,"category":"Job","experience":"Mid-Level"},{"id":1075,"title":"Cell Culture Technician","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.0366,"lng":-87.92369,"category":"Job","experience":"Entry-Level"},{"id":1076,"title":"Ph.D. Program in Biomedical Engineering","company":"Houston Biotech Institute","city":"Houston","state":"TX","lat":29.71159,"lng":-95.40086,"category":"University","experience":"Senior"},{"id":1077,"title":"GMP (Good Manufacturing Practice) Certificate","company":"Portland Bio Training Center","city":"Portland","state":"OR","lat":45.52913,"lng":-122.65825,"category":"Certificate","experience":"Senior"},{"id":1078,"title":"Manufacturing Intern","company":"Sacramento Biotech Corp","city":"Sacramento","state":"CA","lat":38.57033,"lng":-121.47163,"category":"Internship","experience":"Entry-Level"},{"id":1079,"title":"Regulatory Affairs Certificate","company":"Irvine Bio Training Center","city":"Irvine","state":"CA","lat":33.65026,"lng":-117.7431,"category":"Certificate","experience":"Entry-Level"},{"id":1080,"title":"Manufacturing Supervisor","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.81203,"lng":-96.83973,"category":"Job","experience":"Senior"},{"id":1081,"title":"Clinical Trial Coordinator","company":"Palo Alto Biotech Corp","city":"Palo Alto","state":"CA","lat":37.41346,"lng":-122.14869,"category":"Job","experience":"Mid-Level"},{"id":1082,"title":"Summer Bioscience Fellow","company":"Palo Alto Biotech Corp","city":"Palo Alto","state":"CA","lat":37.41133,"lng":-122.16203,"category":"Summer","experience":"Mid-Level"},{"id":1083,"title":"Manufacturing Associate","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.04877,"lng":-105.21189,"category":"Job","experience":"Entry-Level"},{"id":1084,"title":"M.S. in Biotechnology","company":"Boise Biotech Institute","city":"Boise","state":"ID","lat":43.60277,"lng":-116.20341,"category":"University","experience":"Mid-Level"},{"id":1085,"title":"Biomanufacturing Certificate","company":"Minneapolis Bio Training Center","city":"Minneapolis","state":"MN","lat":44.98355,"lng":-93.27437,"category":"Certificate","experience":"Senior"},{"id":1086,"title":"A.S. in Biotechnology","company":"Houston Biotech Institute","city":"Houston","state":"TX","lat":29.77896,"lng":-95.39078,"category":"University","experience":"Entry-Level"},{"id":1087,"title":"Manufacturing Supervisor","company":"St. Louis Biotech Corp","city":"St. Louis","state":"MO","lat":38.61059,"lng":-90.25796,"category":"Job","experience":"Senior"},{"id":1088,"title":"Clinical Trial Coordinator","company":"Portland Biotech Corp","city":"Portland","state":"ME","lat":43.65308,"lng":-70.27539,"category":"Job","experience":"Mid-Level"},{"id":1089,"title":"Regulatory Affairs Certificate","company":"Grand Forks Bio Training Center","city":"Grand Forks","state":"ND","lat":47.93949,"lng":-97.09105,"category":"Certificate","experience":"Senior"},{"id":1090,"title":"Regulatory Affairs Specialist","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.76173,"lng":-111.90487,"category":"Job","experience":"Mid-Level"},{"id":1091,"title":"Bioinformatics Analyst","company":"Cambridge Biotech Corp","city":"Cambridge","state":"MA","lat":42.37624,"lng":-71.11826,"category":"Job","experience":"Mid-Level"},{"id":1092,"title":"Senior Scientist","company":"Philadelphia Biotech Corp","city":"Philadelphia","state":"PA","lat":39.95513,"lng":-75.19773,"category":"Job","experience":"Senior"},{"id":1093,"title":"Bioprocess Technician I","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.95668,"lng":-93.10308,"category":"Job","experience":"Entry-Level"},{"id":1094,"title":"Post-Bacc Biomedical Certificate","company":"Houston Biotech Institute","city":"Houston","state":"TX","lat":29.71161,"lng":-95.40411,"category":"University","experience":"Mid-Level"},{"id":1096,"title":"Manufacturing Intern","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.77787,"lng":-86.17813,"category":"Internship","experience":"Entry-Level"},{"id":1097,"title":"Manufacturing Associate","company":"Philadelphia Biotech Corp","city":"Philadelphia","state":"PA","lat":39.95698,"lng":-75.19668,"category":"Job","experience":"Entry-Level"},{"id":1098,"title":"Ph.D. Program in Molecular Biology","company":"Madison Biotech Institute","city":"Madison","state":"WI","lat":43.07498,"lng":-89.48441,"category":"University","experience":"Senior"},{"id":1099,"title":"Laboratory Technician","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.06137,"lng":-87.9279,"category":"Job","experience":"Entry-Level"},{"id":1100,"title":"Bioinformatics Intern","company":"San Francisco Biotech Corp","city":"San Francisco","state":"CA","lat":37.77874,"lng":-122.46132,"category":"Internship","experience":"Mid-Level"},{"id":1101,"title":"QC Lab Analyst I","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.94052,"lng":-93.22197,"category":"Job","experience":"Entry-Level"},{"id":1102,"title":"Summer Bioscience Fellow","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.06099,"lng":-87.93185,"category":"Summer","experience":"Senior"},{"id":1103,"title":"Summer Field Sampling Aide","company":"Miami Biotech Corp","city":"Miami","state":"FL","lat":25.81343,"lng":-80.22615,"category":"Summer","experience":"Senior"},{"id":1104,"title":"Regulatory Affairs Certificate","company":"Minneapolis Bio Training Center","city":"Minneapolis","state":"MN","lat":44.97496,"lng":-93.22887,"category":"Certificate","experience":"Entry-Level"},{"id":1105,"title":"B.S. in Biomedical Sciences","company":"Las Vegas Biotech Institute","city":"Las Vegas","state":"NV","lat":36.1682,"lng":-115.13893,"category":"University","experience":"Entry-Level"},{"id":1106,"title":"Laboratory Technician","company":"Boston Biotech Corp","city":"Boston","state":"MA","lat":42.35726,"lng":-71.06116,"category":"Job","experience":"Entry-Level"},{"id":1107,"title":"Process Development Associate","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.08992,"lng":-87.94894,"category":"Job","experience":"Mid-Level"},{"id":1108,"title":"Summer Field Sampling Aide","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.47746,"lng":-73.19631,"category":"Summer","experience":"Mid-Level"},{"id":1109,"title":"Quality Assurance Manager","company":"Bethesda Biotech Corp","city":"Bethesda","state":"MD","lat":38.99891,"lng":-77.10143,"category":"Job","experience":"Senior"},{"id":1110,"title":"Senior Bioprocess Engineer","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.00887,"lng":-105.26448,"category":"Job","experience":"Senior"},{"id":1111,"title":"Manufacturing Associate","company":"Research Triangle Biotech Corp","city":"Research Triangle","state":"NC","lat":35.89801,"lng":-78.86419,"category":"Job","experience":"Entry-Level"},{"id":1112,"title":"Process Development Lead","company":"Boise Biotech Corp","city":"Boise","state":"ID","lat":43.61464,"lng":-116.20279,"category":"Job","experience":"Senior"},{"id":1113,"title":"B.S. in Biomedical Sciences","company":"Boston Biotech Institute","city":"Boston","state":"MA","lat":42.3375,"lng":-71.10279,"category":"University","experience":"Entry-Level"},{"id":1114,"title":"Manufacturing Intern","company":"Research Triangle Biotech Corp","city":"Research Triangle","state":"NC","lat":35.90918,"lng":-78.89133,"category":"Internship","experience":"Mid-Level"},{"id":1115,"title":"Biomanufacturing Certificate","company":"Madison Bio Training Center","city":"Madison","state":"WI","lat":43.08024,"lng":-89.36171,"category":"Certificate","experience":"Senior"},{"id":1116,"title":"Quality Assurance Manager","company":"Seattle Biotech Corp","city":"Seattle","state":"WA","lat":47.5789,"lng":-122.31248,"category":"Job","experience":"Senior"},{"id":1117,"title":"Senior Bioprocess Engineer","company":"Anchorage Biotech Corp","city":"Anchorage","state":"AK","lat":61.21019,"lng":-149.82815,"category":"Job","experience":"Senior"},{"id":1118,"title":"Regulatory Affairs Specialist","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.75053,"lng":-86.13921,"category":"Job","experience":"Mid-Level"},{"id":1119,"title":"Quality Control Intern","company":"Madison Biotech Corp","city":"Madison","state":"WI","lat":43.06828,"lng":-89.43988,"category":"Internship","experience":"Entry-Level"},{"id":1120,"title":"Biomanufacturing Certificate","company":"Boston Bio Training Center","city":"Boston","state":"MA","lat":42.35598,"lng":-71.06002,"category":"Certificate","experience":"Mid-Level"},{"id":1121,"title":"Summer Lab Assistant","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.75974,"lng":-111.90572,"category":"Summer","experience":"Senior"},{"id":1122,"title":"Manufacturing Supervisor","company":"Seattle Biotech Corp","city":"Seattle","state":"WA","lat":47.62331,"lng":-122.32119,"category":"Job","experience":"Senior"},{"id":1123,"title":"M.S. in Translational Medicine","company":"Los Angeles Biotech Institute","city":"Los Angeles","state":"CA","lat":34.05264,"lng":-118.24157,"category":"University","experience":"Senior"},{"id":1124,"title":"Cell Culture Technician","company":"Raleigh Biotech Corp","city":"Raleigh","state":"NC","lat":35.83348,"lng":-78.64373,"category":"Job","experience":"Entry-Level"},{"id":1125,"title":"Ph.D. Program in Molecular Biology","company":"Portland Biotech Institute","city":"Portland","state":"ME","lat":43.65317,"lng":-70.27416,"category":"University","experience":"Senior"},{"id":1126,"title":"Manufacturing Intern","company":"Billings Biotech Corp","city":"Billings","state":"MT","lat":45.75925,"lng":-108.59916,"category":"Internship","experience":"Entry-Level"},{"id":1127,"title":"Senior Scientist","company":"Cambridge Biotech Corp","city":"Cambridge","state":"MA","lat":42.37672,"lng":-71.11664,"category":"Job","experience":"Senior"},{"id":1128,"title":"Principal Research Scientist","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.82324,"lng":-119.70373,"category":"Job","experience":"Senior"},{"id":1129,"title":"Summer Biomanufacturing Trainee","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.86802,"lng":-87.67519,"category":"Summer","experience":"Mid-Level"},{"id":1130,"title":"Clinical Trial Coordinator","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.76874,"lng":-86.15795,"category":"Job","experience":"Mid-Level"},{"id":1131,"title":"Cell Culture Technician","company":"Philadelphia Biotech Corp","city":"Philadelphia","state":"PA","lat":39.95156,"lng":-75.16389,"category":"Job","experience":"Entry-Level"},{"id":1132,"title":"Clinical Operations Lead","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.94146,"lng":-93.22182,"category":"Job","experience":"Senior"},{"id":1133,"title":"Clinical Data Assistant","company":"San Antonio Biotech Corp","city":"San Antonio","state":"TX","lat":29.50653,"lng":-98.57777,"category":"Job","experience":"Entry-Level"},{"id":1134,"title":"Research Associate II","company":"Denville Biotech Corp","city":"Denville","state":"NJ","lat":40.88584,"lng":-74.47073,"category":"Job","experience":"Mid-Level"},{"id":1135,"title":"Bioprocess Technician I","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.00692,"lng":-105.26801,"category":"Job","experience":"Entry-Level"},{"id":1136,"title":"QC Microbiology Analyst","company":"Phoenix Biotech Corp","city":"Phoenix","state":"AZ","lat":33.4611,"lng":-112.03967,"category":"Job","experience":"Mid-Level"},{"id":1137,"title":"Clinical Trial Coordinator","company":"Fargo Biotech Corp","city":"Fargo","state":"ND","lat":46.84119,"lng":-96.83892,"category":"Job","experience":"Mid-Level"},{"id":1138,"title":"Assay Development Scientist","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.66546,"lng":-111.04549,"category":"Job","experience":"Mid-Level"},{"id":1139,"title":"Clinical Operations Lead","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.05936,"lng":-118.44174,"category":"Job","experience":"Senior"},{"id":1140,"title":"Ph.D. Program in Molecular Biology","company":"Tucson Biotech Institute","city":"Tucson","state":"AZ","lat":32.24059,"lng":-110.94655,"category":"University","experience":"Senior"},{"id":1141,"title":"Clinical Research Coordinator Certificate","company":"St. Paul Bio Training Center","city":"St. Paul","state":"MN","lat":44.98127,"lng":-93.14868,"category":"Certificate","experience":"Mid-Level"},{"id":1142,"title":"GMP (Good Manufacturing Practice) Certificate","company":"Atlanta Bio Training Center","city":"Atlanta","state":"GA","lat":33.74734,"lng":-84.3896,"category":"Certificate","experience":"Senior"},{"id":1143,"title":"QC Lab Analyst I","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.87331,"lng":-87.67087,"category":"Job","experience":"Entry-Level"},{"id":1144,"title":"M.S. in Translational Medicine","company":"Denver Biotech Institute","city":"Denver","state":"CO","lat":39.771,"lng":-104.97901,"category":"University","experience":"Senior"},{"id":1145,"title":"Post-Bacc Biomedical Certificate","company":"Bozeman Biotech Institute","city":"Bozeman","state":"MT","lat":45.65842,"lng":-111.01041,"category":"University","experience":"Mid-Level"},{"id":1146,"title":"Laboratory Intern","company":"Philadelphia Biotech Corp","city":"Philadelphia","state":"PA","lat":39.94943,"lng":-75.19517,"category":"Internship","experience":"Mid-Level"},{"id":1147,"title":"Process Development Lead","company":"South San Francisco Biotech Corp","city":"South San Francisco","state":"CA","lat":37.65571,"lng":-122.40643,"category":"Job","experience":"Senior"},{"id":1148,"title":"Summer Field Sampling Aide","company":"Fargo Biotech Corp","city":"Fargo","state":"ND","lat":46.89826,"lng":-96.80492,"category":"Summer","experience":"Mid-Level"},{"id":1149,"title":"Principal Research Scientist","company":"Albuquerque Biotech Corp","city":"Albuquerque","state":"NM","lat":35.0595,"lng":-106.6209,"category":"Job","experience":"Senior"},{"id":1150,"title":"QC Lab Analyst I","company":"Research Triangle Biotech Corp","city":"Research Triangle","state":"NC","lat":35.9083,"lng":-78.88835,"category":"Job","experience":"Entry-Level"},{"id":1151,"title":"Quality Assurance Manager","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.95477,"lng":-93.101,"category":"Job","experience":"Senior"},{"id":1152,"title":"M.S. in Bioinformatics","company":"Atlanta Biotech Institute","city":"Atlanta","state":"GA","lat":33.75042,"lng":-84.38658,"category":"University","experience":"Mid-Level"},{"id":1153,"title":"Manufacturing Associate","company":"Raleigh Biotech Corp","city":"Raleigh","state":"NC","lat":35.8352,"lng":-78.6426,"category":"Job","experience":"Entry-Level"},{"id":1154,"title":"Process Development Lead","company":"San Francisco Biotech Corp","city":"San Francisco","state":"CA","lat":37.76885,"lng":-122.44799,"category":"Job","experience":"Senior"},{"id":1155,"title":"Quality Control Intern","company":"Cambridge Biotech Corp","city":"Cambridge","state":"MA","lat":42.36256,"lng":-71.08273,"category":"Internship","experience":"Senior"},{"id":1156,"title":"M.S. in Biotechnology","company":"San Antonio Biotech Institute","city":"San Antonio","state":"TX","lat":29.37538,"lng":-98.43961,"category":"University","experience":"Mid-Level"},{"id":1157,"title":"QC Lab Analyst I","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.66018,"lng":-111.01031,"category":"Job","experience":"Entry-Level"},{"id":1158,"title":"Summer Field Sampling Aide","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.81212,"lng":-96.83995,"category":"Summer","experience":"Mid-Level"},{"id":1160,"title":"Clinical Operations Lead","company":"Albuquerque Biotech Corp","city":"Albuquerque","state":"NM","lat":35.08424,"lng":-106.6182,"category":"Job","experience":"Senior"},{"id":1161,"title":"Clinical Research Coordinator Certificate","company":"San Diego Bio Training Center","city":"San Diego","state":"CA","lat":32.9115,"lng":-117.14185,"category":"Certificate","experience":"Senior"},{"id":1162,"title":"Summer Bioscience Fellow","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.77689,"lng":-96.79564,"category":"Summer","experience":"Mid-Level"},{"id":1163,"title":"Ph.D. Program in Biomedical Engineering","company":"Las Vegas Biotech Institute","city":"Las Vegas","state":"NV","lat":36.10752,"lng":-115.14292,"category":"University","experience":"Senior"},{"id":1166,"title":"Senior Bioprocess Engineer","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.87398,"lng":-87.67017,"category":"Job","experience":"Senior"},{"id":1167,"title":"Quality Control Intern","company":"Portland Biotech Corp","city":"Portland","state":"OR","lat":45.50036,"lng":-122.68683,"category":"Internship","experience":"Senior"},{"id":1168,"title":"Summer Field Sampling Aide","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.86916,"lng":-87.67478,"category":"Summer","experience":"Mid-Level"},{"id":1169,"title":"Ph.D. Program in Biomedical Engineering","company":"Philadelphia Biotech Institute","city":"Philadelphia","state":"PA","lat":39.95238,"lng":-75.19384,"category":"University","experience":"Senior"},{"id":1170,"title":"Ph.D. Program in Molecular Biology","company":"Minneapolis Biotech Institute","city":"Minneapolis","state":"MN","lat":44.93865,"lng":-93.21973,"category":"University","experience":"Senior"},{"id":1171,"title":"M.S. in Translational Medicine","company":"Cambridge Biotech Institute","city":"Cambridge","state":"MA","lat":42.36685,"lng":-71.10465,"category":"University","experience":"Senior"},{"id":1172,"title":"Summer Bioscience Fellow","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.06834,"lng":-118.44479,"category":"Summer","experience":"Senior"},{"id":1173,"title":"Assay Development Scientist","company":"Ann Arbor Biotech Corp","city":"Ann Arbor","state":"MI","lat":42.27965,"lng":-83.74106,"category":"Job","experience":"Mid-Level"},{"id":1174,"title":"Regulatory Affairs Specialist","company":"Bethesda Biotech Corp","city":"Bethesda","state":"MD","lat":38.97972,"lng":-77.09202,"category":"Job","experience":"Mid-Level"},{"id":1175,"title":"Clinical Data Assistant","company":"Madison Biotech Corp","city":"Madison","state":"WI","lat":43.07726,"lng":-89.41342,"category":"Job","experience":"Entry-Level"},{"id":1176,"title":"Research Associate II","company":"Research Triangle Biotech Corp","city":"Research Triangle","state":"NC","lat":36.00191,"lng":-78.93958,"category":"Job","experience":"Mid-Level"},{"id":1177,"title":"Process Development Associate","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.7977,"lng":-96.80366,"category":"Job","experience":"Mid-Level"},{"id":1178,"title":"QC Microbiology Analyst","company":"Eugene Biotech Corp","city":"Eugene","state":"OR","lat":44.08999,"lng":-123.13018,"category":"Job","experience":"Mid-Level"},{"id":1179,"title":"Research Assistant","company":"Atlanta Biotech Corp","city":"Atlanta","state":"GA","lat":33.79934,"lng":-84.32484,"category":"Job","experience":"Entry-Level"},{"id":1181,"title":"Summer Lab Assistant","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.47922,"lng":-73.19201,"category":"Summer","experience":"Mid-Level"},{"id":1182,"title":"Clinical Data Assistant","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.98707,"lng":-93.18035,"category":"Job","experience":"Entry-Level"},{"id":1183,"title":"Summer Field Sampling Aide","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.75953,"lng":-111.90548,"category":"Summer","experience":"Entry-Level"},{"id":1184,"title":"Process Development Associate","company":"Billings Biotech Corp","city":"Billings","state":"MT","lat":45.78259,"lng":-108.49987,"category":"Job","experience":"Mid-Level"},{"id":1185,"title":"Biomanufacturing Certificate","company":"Seattle Bio Training Center","city":"Seattle","state":"WA","lat":47.6243,"lng":-122.31791,"category":"Certificate","experience":"Mid-Level"},{"id":1186,"title":"Quality Assurance Manager","company":"Tucson Biotech Corp","city":"Tucson","state":"AZ","lat":32.22311,"lng":-110.97618,"category":"Job","experience":"Senior"},{"id":1187,"title":"Post-Bacc Biomedical Certificate","company":"Boston Biotech Institute","city":"Boston","state":"MA","lat":42.33937,"lng":-71.07359,"category":"University","experience":"Mid-Level"},{"id":1188,"title":"Manufacturing Associate","company":"Berkeley Biotech Corp","city":"Berkeley","state":"CA","lat":37.85346,"lng":-122.27199,"category":"Job","experience":"Entry-Level"},{"id":1189,"title":"M.S. in Translational Medicine","company":"New York Biotech Institute","city":"New York","state":"NY","lat":40.73413,"lng":-73.99013,"category":"University","experience":"Senior"},{"id":1190,"title":"Bioinformatics Intern","company":"Seattle Biotech Corp","city":"Seattle","state":"WA","lat":47.57773,"lng":-122.3138,"category":"Internship","experience":"Entry-Level"},{"id":1191,"title":"Clinical Research Coordinator Certificate","company":"Salt Lake City Bio Training Center","city":"Salt Lake City","state":"UT","lat":40.76053,"lng":-111.90273,"category":"Certificate","experience":"Senior"},{"id":1192,"title":"Manufacturing Intern","company":"Bethesda Biotech Corp","city":"Bethesda","state":"MD","lat":38.9803,"lng":-77.09076,"category":"Internship","experience":"Entry-Level"},{"id":1193,"title":"Summer Field Sampling Aide","company":"Las Vegas Biotech Corp","city":"Las Vegas","state":"NV","lat":36.11868,"lng":-115.24102,"category":"Summer","experience":"Mid-Level"},{"id":1194,"title":"Senior Bioprocess Engineer","company":"Reno Biotech Corp","city":"Reno","state":"NV","lat":39.51609,"lng":-119.8087,"category":"Job","experience":"Senior"},{"id":1195,"title":"M.S. in Translational Medicine","company":"Eugene Biotech Institute","city":"Eugene","state":"OR","lat":44.05361,"lng":-123.08708,"category":"University","experience":"Senior"},{"id":1196,"title":"Post-Bacc Biomedical Certificate","company":"Indianapolis Biotech Institute","city":"Indianapolis","state":"IN","lat":39.8709,"lng":-86.14203,"category":"University","experience":"Mid-Level"},{"id":1197,"title":"Quality Control Intern","company":"New York Biotech Corp","city":"New York","state":"NY","lat":40.73025,"lng":-73.99665,"category":"Internship","experience":"Mid-Level"},{"id":1199,"title":"Manufacturing Supervisor","company":"Irvine Biotech Corp","city":"Irvine","state":"CA","lat":33.69681,"lng":-117.81907,"category":"Job","experience":"Senior"},{"id":1200,"title":"B.S. in Biotechnology","company":"La Jolla Biotech Institute","city":"La Jolla","state":"CA","lat":32.8812,"lng":-117.23392,"category":"University","experience":"Entry-Level"},{"id":1201,"title":"Research Intern","company":"Anchorage Biotech Corp","city":"Anchorage","state":"AK","lat":61.19653,"lng":-149.87788,"category":"Internship","experience":"Senior"},{"id":1202,"title":"Manufacturing Associate","company":"Las Vegas Biotech Corp","city":"Las Vegas","state":"NV","lat":36.13733,"lng":-115.15751,"category":"Job","experience":"Entry-Level"},{"id":1203,"title":"M.S. in Bioinformatics","company":"San Francisco Biotech Institute","city":"San Francisco","state":"CA","lat":37.79209,"lng":-122.41663,"category":"University","experience":"Mid-Level"},{"id":1204,"title":"Senior Scientist","company":"San Francisco Biotech Corp","city":"San Francisco","state":"CA","lat":37.75372,"lng":-122.43968,"category":"Job","experience":"Senior"},{"id":1205,"title":"Principal Research Scientist","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.87239,"lng":-87.66895,"category":"Job","experience":"Senior"},{"id":1206,"title":"Manufacturing Supervisor","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.07479,"lng":-118.37965,"category":"Job","experience":"Senior"},{"id":1207,"title":"M.S. in Biotechnology","company":"Tucson Biotech Institute","city":"Tucson","state":"AZ","lat":32.22161,"lng":-110.97621,"category":"University","experience":"Mid-Level"},{"id":1209,"title":"M.S. in Bioinformatics","company":"Spokane Biotech Institute","city":"Spokane","state":"WA","lat":47.66871,"lng":-117.23848,"category":"University","experience":"Mid-Level"},{"id":1210,"title":"Bioinformatics Analyst","company":"Las Vegas Biotech Corp","city":"Las Vegas","state":"NV","lat":36.11985,"lng":-115.23823,"category":"Job","experience":"Mid-Level"},{"id":1211,"title":"Research Associate II","company":"Cambridge Biotech Corp","city":"Cambridge","state":"MA","lat":42.36515,"lng":-71.10287,"category":"Job","experience":"Mid-Level"},{"id":1212,"title":"Summer Bioscience Fellow","company":"Billings Biotech Corp","city":"Billings","state":"MT","lat":45.76062,"lng":-108.60012,"category":"Summer","experience":"Mid-Level"},{"id":1213,"title":"Summer Field Sampling Aide","company":"Boston Biotech Corp","city":"Boston","state":"MA","lat":42.33838,"lng":-71.10351,"category":"Summer","experience":"Senior"},{"id":1214,"title":"Research Assistant","company":"Seattle Biotech Corp","city":"Seattle","state":"WA","lat":47.57735,"lng":-122.30998,"category":"Job","experience":"Entry-Level"},{"id":1215,"title":"Quality Control Intern","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.77833,"lng":-86.18108,"category":"Internship","experience":"Entry-Level"},{"id":1216,"title":"Manufacturing Intern","company":"Denville Biotech Corp","city":"Denville","state":"NJ","lat":40.89667,"lng":-74.48313,"category":"Internship","experience":"Entry-Level"},{"id":1218,"title":"Laboratory Technician","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.88455,"lng":-87.65163,"category":"Job","experience":"Entry-Level"},{"id":1219,"title":"Summer Biomanufacturing Trainee","company":"La Jolla Biotech Corp","city":"La Jolla","state":"CA","lat":32.87544,"lng":-117.21643,"category":"Summer","experience":"Senior"},{"id":1220,"title":"Biomanufacturing Certificate","company":"Milwaukee Bio Training Center","city":"Milwaukee","state":"WI","lat":43.08835,"lng":-87.95047,"category":"Certificate","experience":"Entry-Level"},{"id":1221,"title":"Clinical Research Coordinator Certificate","company":"Burlington Bio Training Center","city":"Burlington","state":"VT","lat":44.47678,"lng":-73.19809,"category":"Certificate","experience":"Mid-Level"},{"id":1222,"title":"Summer Bioscience Fellow","company":"Albuquerque Biotech Corp","city":"Albuquerque","state":"NM","lat":35.14479,"lng":-106.59501,"category":"Summer","experience":"Entry-Level"},{"id":1223,"title":"Manufacturing Associate","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.81199,"lng":-96.83879,"category":"Job","experience":"Entry-Level"},{"id":1224,"title":"Bioinformatics Analyst","company":"Seattle Biotech Corp","city":"Seattle","state":"WA","lat":47.58075,"lng":-122.31356,"category":"Job","experience":"Mid-Level"},{"id":1225,"title":"Laboratory Technician","company":"Houston Biotech Corp","city":"Houston","state":"TX","lat":29.71255,"lng":-95.401,"category":"Job","experience":"Entry-Level"},{"id":1226,"title":"Clinical Research Coordinator Certificate","company":"Research Triangle Bio Training Center","city":"Research Triangle","state":"NC","lat":36.00136,"lng":-78.93666,"category":"Certificate","experience":"Senior"},{"id":1227,"title":"Manufacturing Supervisor","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.764,"lng":-86.1726,"category":"Job","experience":"Senior"},{"id":1228,"title":"Research Assistant","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.48417,"lng":-73.18432,"category":"Job","experience":"Entry-Level"},{"id":1229,"title":"Assay Development Scientist","company":"La Jolla Biotech Corp","city":"La Jolla","state":"CA","lat":32.87354,"lng":-117.2128,"category":"Job","experience":"Mid-Level"},{"id":1230,"title":"Clinical Operations Lead","company":"Atlanta Biotech Corp","city":"Atlanta","state":"GA","lat":33.74878,"lng":-84.38787,"category":"Job","experience":"Senior"},{"id":1231,"title":"Process Development Lead","company":"Spokane Biotech Corp","city":"Spokane","state":"WA","lat":47.6364,"lng":-117.41134,"category":"Job","experience":"Senior"},{"id":1232,"title":"Laboratory Technician","company":"Dallas Biotech Corp","city":"Dallas","state":"TX","lat":32.81417,"lng":-96.83887,"category":"Job","experience":"Entry-Level"},{"id":1233,"title":"Ph.D. Program in Molecular Biology","company":"Boston Biotech Institute","city":"Boston","state":"MA","lat":42.35717,"lng":-71.05806,"category":"University","experience":"Senior"},{"id":1234,"title":"Summer Biomanufacturing Trainee","company":"Philadelphia Biotech Corp","city":"Philadelphia","state":"PA","lat":39.95457,"lng":-75.19553,"category":"Summer","experience":"Senior"},{"id":1235,"title":"Clinical Research Intern","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.06784,"lng":-118.44495,"category":"Internship","experience":"Senior"},{"id":1236,"title":"Senior Bioprocess Engineer","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.73823,"lng":-119.7813,"category":"Job","experience":"Senior"},{"id":1237,"title":"Clinical Operations Lead","company":"Reno Biotech Corp","city":"Reno","state":"NV","lat":39.529,"lng":-119.81237,"category":"Job","experience":"Senior"},{"id":1238,"title":"Process Development Lead","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.4645,"lng":-73.20079,"category":"Job","experience":"Senior"},{"id":1239,"title":"Research Associate II","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.68396,"lng":-111.07665,"category":"Job","experience":"Mid-Level"},{"id":1240,"title":"B.S. in Biotechnology","company":"St. Louis Biotech Institute","city":"St. Louis","state":"MO","lat":38.60854,"lng":-90.25966,"category":"University","experience":"Entry-Level"},{"id":1241,"title":"QC Microbiology Analyst","company":"Boise Biotech Corp","city":"Boise","state":"ID","lat":43.60242,"lng":-116.20234,"category":"Job","experience":"Mid-Level"},{"id":1242,"title":"Research Assistant","company":"Boston Biotech Corp","city":"Boston","state":"MA","lat":42.3404,"lng":-71.0761,"category":"Job","experience":"Entry-Level"},{"id":1243,"title":"M.S. in Translational Medicine","company":"San Antonio Biotech Institute","city":"San Antonio","state":"TX","lat":29.44366,"lng":-98.48,"category":"University","experience":"Senior"},{"id":1244,"title":"Clinical Operations Lead","company":"San Antonio Biotech Corp","city":"San Antonio","state":"TX","lat":29.42546,"lng":-98.494,"category":"Job","experience":"Senior"},{"id":1245,"title":"Clinical Data Assistant","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.85728,"lng":-87.66128,"category":"Job","experience":"Entry-Level"},{"id":1246,"title":"Manufacturing Intern","company":"Phoenix Biotech Corp","city":"Phoenix","state":"AZ","lat":33.46191,"lng":-112.04234,"category":"Internship","experience":"Senior"},{"id":1247,"title":"Bioprocess Technician I","company":"Austin Biotech Corp","city":"Austin","state":"TX","lat":30.26509,"lng":-97.7117,"category":"Job","experience":"Entry-Level"},{"id":1248,"title":"Laboratory Intern","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.95007,"lng":-93.30007,"category":"Internship","experience":"Mid-Level"},{"id":1249,"title":"Summer Biomanufacturing Trainee","company":"Phoenix Biotech Corp","city":"Phoenix","state":"AZ","lat":33.46043,"lng":-112.04139,"category":"Summer","experience":"Mid-Level"},{"id":1250,"title":"Bioinformatics Intern","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.67761,"lng":-111.0434,"category":"Internship","experience":"Mid-Level"},{"id":1251,"title":"B.S. in Biochemistry","company":"Minneapolis Biotech Institute","city":"Minneapolis","state":"MN","lat":44.95132,"lng":-93.2965,"category":"University","experience":"Entry-Level"},{"id":1253,"title":"Laboratory Technician","company":"Eugene Biotech Corp","city":"Eugene","state":"OR","lat":44.05242,"lng":-123.08641,"category":"Job","experience":"Entry-Level"},{"id":1254,"title":"Regulatory Affairs Certificate","company":"Eugene Bio Training Center","city":"Eugene","state":"OR","lat":44.02327,"lng":-123.08201,"category":"Certificate","experience":"Senior"},{"id":1256,"title":"Bioinformatics Intern","company":"Anchorage Biotech Corp","city":"Anchorage","state":"AK","lat":61.1932,"lng":-149.87882,"category":"Internship","experience":"Entry-Level"},{"id":1257,"title":"B.S. in Biomedical Sciences","company":"Bothell Biotech Institute","city":"Bothell","state":"WA","lat":47.79071,"lng":-122.2038,"category":"University","experience":"Entry-Level"},{"id":1258,"title":"A.S. in Biotechnology","company":"Boise Biotech Institute","city":"Boise","state":"ID","lat":43.61457,"lng":-116.20235,"category":"University","experience":"Entry-Level"},{"id":1259,"title":"Regulatory Affairs Certificate","company":"Phoenix Bio Training Center","city":"Phoenix","state":"AZ","lat":33.45189,"lng":-112.06682,"category":"Certificate","experience":"Entry-Level"},{"id":1260,"title":"Ph.D. Program in Molecular Biology","company":"Houston Biotech Institute","city":"Houston","state":"TX","lat":29.72775,"lng":-95.40785,"category":"University","experience":"Senior"},{"id":1261,"title":"Principal Research Scientist","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.98056,"lng":-93.15091,"category":"Job","experience":"Senior"},{"id":1262,"title":"Post-Bacc Biomedical Certificate","company":"Austin Biotech Institute","city":"Austin","state":"TX","lat":30.26476,"lng":-97.70836,"category":"University","experience":"Mid-Level"},{"id":1263,"title":"M.S. in Bioinformatics","company":"Denville Biotech Institute","city":"Denville","state":"NJ","lat":40.89636,"lng":-74.48336,"category":"University","experience":"Mid-Level"},{"id":1264,"title":"Assay Development Scientist","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.46567,"lng":-73.20008,"category":"Job","experience":"Mid-Level"},{"id":1265,"title":"Manufacturing Associate","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.78955,"lng":-87.59949,"category":"Job","experience":"Entry-Level"},{"id":1266,"title":"Clinical Research Coordinator Certificate","company":"Milwaukee Bio Training Center","city":"Milwaukee","state":"WI","lat":43.09136,"lng":-87.95103,"category":"Certificate","experience":"Entry-Level"},{"id":1267,"title":"M.S. in Biotechnology","company":"Irvine Biotech Institute","city":"Irvine","state":"CA","lat":33.6408,"lng":-117.84278,"category":"University","experience":"Mid-Level"},{"id":1268,"title":"B.S. in Biotechnology","company":"Las Vegas Biotech Institute","city":"Las Vegas","state":"NV","lat":36.11997,"lng":-115.23793,"category":"University","experience":"Entry-Level"},{"id":1269,"title":"QC Lab Analyst I","company":"Portland Biotech Corp","city":"Portland","state":"ME","lat":43.66869,"lng":-70.29804,"category":"Job","experience":"Entry-Level"},{"id":1270,"title":"Quality Assurance Manager","company":"Portland Biotech Corp","city":"Portland","state":"OR","lat":45.51227,"lng":-122.62438,"category":"Job","experience":"Senior"},{"id":1271,"title":"Clinical Research Intern","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.92341,"lng":-87.65086,"category":"Internship","experience":"Entry-Level"},{"id":1272,"title":"Regulatory Affairs Specialist","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.9848,"lng":-93.27401,"category":"Job","experience":"Mid-Level"},{"id":1273,"title":"Process Development Lead","company":"San Antonio Biotech Corp","city":"San Antonio","state":"TX","lat":29.37364,"lng":-98.43841,"category":"Job","experience":"Senior"},{"id":1274,"title":"Summer Biomanufacturing Trainee","company":"Irvine Biotech Corp","city":"Irvine","state":"CA","lat":33.6964,"lng":-117.81845,"category":"Summer","experience":"Senior"},{"id":1275,"title":"Process Development Associate","company":"Reno Biotech Corp","city":"Reno","state":"NV","lat":39.53439,"lng":-119.75101,"category":"Job","experience":"Mid-Level"},{"id":1276,"title":"Summer Lab Assistant","company":"Billings Biotech Corp","city":"Billings","state":"MT","lat":45.78495,"lng":-108.52979,"category":"Summer","experience":"Entry-Level"},{"id":1277,"title":"Research Assistant","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.08959,"lng":-87.95116,"category":"Job","experience":"Entry-Level"},{"id":1278,"title":"Assay Development Scientist","company":"San Francisco Biotech Corp","city":"San Francisco","state":"CA","lat":37.79417,"lng":-122.41486,"category":"Job","experience":"Mid-Level"},{"id":1279,"title":"Regulatory Affairs Certificate","company":"Reno Bio Training Center","city":"Reno","state":"NV","lat":39.48994,"lng":-119.80205,"category":"Certificate","experience":"Entry-Level"},{"id":1280,"title":"Bioinformatics Analyst","company":"San Diego Biotech Corp","city":"San Diego","state":"CA","lat":32.83165,"lng":-117.14028,"category":"Job","experience":"Mid-Level"},{"id":1281,"title":"Research Associate II","company":"Raleigh Biotech Corp","city":"Raleigh","state":"NC","lat":35.8367,"lng":-78.64253,"category":"Job","experience":"Mid-Level"},{"id":1282,"title":"M.S. in Biotechnology","company":"Seattle Biotech Institute","city":"Seattle","state":"WA","lat":47.65988,"lng":-122.33379,"category":"University","experience":"Mid-Level"},{"id":1283,"title":"Manufacturing Supervisor","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.66055,"lng":-111.00948,"category":"Job","experience":"Senior"},{"id":1284,"title":"Laboratory Intern","company":"Eugene Biotech Corp","city":"Eugene","state":"OR","lat":44.05177,"lng":-123.08854,"category":"Internship","experience":"Senior"},{"id":1285,"title":"Assay Development Scientist","company":"Berkeley Biotech Corp","city":"Berkeley","state":"CA","lat":37.87022,"lng":-122.25802,"category":"Job","experience":"Mid-Level"},{"id":1286,"title":"Clinical Research Coordinator Certificate","company":"Houston Bio Training Center","city":"Houston","state":"TX","lat":29.77923,"lng":-95.38994,"category":"Certificate","experience":"Senior"},{"id":1287,"title":"Process Development Lead","company":"Chicago Biotech Corp","city":"Chicago","state":"IL","lat":41.85575,"lng":-87.66096,"category":"Job","experience":"Senior"},{"id":1288,"title":"Manufacturing Intern","company":"Houston Biotech Corp","city":"Houston","state":"TX","lat":29.71104,"lng":-95.40401,"category":"Internship","experience":"Senior"},{"id":1289,"title":"Regulatory Affairs Certificate","company":"Bozeman Bio Training Center","city":"Bozeman","state":"MT","lat":45.68352,"lng":-111.07443,"category":"Certificate","experience":"Senior"},{"id":1291,"title":"Research Assistant","company":"Boise Biotech Corp","city":"Boise","state":"ID","lat":43.59024,"lng":-116.22853,"category":"Job","experience":"Entry-Level"},{"id":1292,"title":"GMP (Good Manufacturing Practice) Certificate","company":"St. Louis Bio Training Center","city":"St. Louis","state":"MO","lat":38.63133,"lng":-90.24882,"category":"Certificate","experience":"Senior"},{"id":1293,"title":"Quality Control Intern","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.8292,"lng":-119.76806,"category":"Internship","experience":"Senior"},{"id":1294,"title":"Bioinformatics Analyst","company":"Tucson Biotech Corp","city":"Tucson","state":"AZ","lat":32.22265,"lng":-110.97316,"category":"Job","experience":"Mid-Level"},{"id":1295,"title":"Post-Bacc Biomedical Certificate","company":"New York Biotech Institute","city":"New York","state":"NY","lat":40.75532,"lng":-73.98186,"category":"University","experience":"Mid-Level"},{"id":1297,"title":"QC Microbiology Analyst","company":"Bethesda Biotech Corp","city":"Bethesda","state":"MD","lat":38.98102,"lng":-77.09199,"category":"Job","experience":"Mid-Level"},{"id":1298,"title":"Laboratory Technician Certificate","company":"Tucson Bio Training Center","city":"Tucson","state":"AZ","lat":32.23059,"lng":-110.95105,"category":"Certificate","experience":"Mid-Level"},{"id":1299,"title":"Assay Development Scientist","company":"Madison Biotech Corp","city":"Madison","state":"WI","lat":43.07828,"lng":-89.36174,"category":"Job","experience":"Mid-Level"},{"id":1300,"title":"Summer Research Aide","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.76401,"lng":-111.84386,"category":"Summer","experience":"Senior"},{"id":1301,"title":"Clinical Data Assistant","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.67834,"lng":-111.04216,"category":"Job","experience":"Entry-Level"},{"id":1302,"title":"Summer Bioscience Fellow","company":"Bothell Biotech Corp","city":"Bothell","state":"WA","lat":47.76251,"lng":-122.2048,"category":"Summer","experience":"Senior"},{"id":1303,"title":"M.S. in Translational Medicine","company":"Madison Biotech Institute","city":"Madison","state":"WI","lat":43.07517,"lng":-89.41057,"category":"University","experience":"Senior"},{"id":1304,"title":"QC Microbiology Analyst","company":"Austin Biotech Corp","city":"Austin","state":"TX","lat":30.26512,"lng":-97.70846,"category":"Job","experience":"Mid-Level"},{"id":1305,"title":"Research Assistant","company":"Eugene Biotech Corp","city":"Eugene","state":"OR","lat":44.09003,"lng":-123.13172,"category":"Job","experience":"Entry-Level"},{"id":1306,"title":"Cell Culture Technician","company":"Indianapolis Biotech Corp","city":"Indianapolis","state":"IN","lat":39.8715,"lng":-86.14161,"category":"Job","experience":"Entry-Level"},{"id":1307,"title":"Regulatory Affairs Specialist","company":"Phoenix Biotech Corp","city":"Phoenix","state":"AZ","lat":33.5096,"lng":-112.02408,"category":"Job","experience":"Mid-Level"},{"id":1308,"title":"Summer Field Sampling Aide","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.04873,"lng":-105.20832,"category":"Summer","experience":"Mid-Level"},{"id":1309,"title":"Research Associate II","company":"Spokane Biotech Corp","city":"Spokane","state":"WA","lat":47.66838,"lng":-117.24069,"category":"Job","experience":"Mid-Level"},{"id":1311,"title":"M.S. in Bioinformatics","company":"Raleigh Biotech Institute","city":"Raleigh","state":"NC","lat":35.8343,"lng":-78.64037,"category":"University","experience":"Mid-Level"},{"id":1312,"title":"Research Assistant","company":"Miami Biotech Corp","city":"Miami","state":"FL","lat":25.68823,"lng":-80.31904,"category":"Job","experience":"Entry-Level"},{"id":1313,"title":"Assay Development Scientist","company":"Grand Forks Biotech Corp","city":"Grand Forks","state":"ND","lat":47.92332,"lng":-97.07899,"category":"Job","experience":"Mid-Level"},{"id":1314,"title":"Ph.D. Program in Molecular Biology","company":"Spokane Biotech Institute","city":"Spokane","state":"WA","lat":47.62075,"lng":-117.38186,"category":"University","experience":"Senior"},{"id":1315,"title":"Summer Research Aide","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.05383,"lng":-118.24481,"category":"Summer","experience":"Senior"},{"id":1318,"title":"A.S. in Biotechnology","company":"Portland Biotech Institute","city":"Portland","state":"ME","lat":43.67685,"lng":-70.34652,"category":"University","experience":"Entry-Level"},{"id":1319,"title":"Ph.D. Program in Biomedical Engineering","company":"Spokane Biotech Institute","city":"Spokane","state":"WA","lat":47.63553,"lng":-117.4107,"category":"University","experience":"Senior"},{"id":1320,"title":"Assay Development Scientist","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.82394,"lng":-119.7005,"category":"Job","experience":"Mid-Level"},{"id":1321,"title":"Manufacturing Associate","company":"Milwaukee Biotech Corp","city":"Milwaukee","state":"WI","lat":43.03535,"lng":-87.92432,"category":"Job","experience":"Entry-Level"},{"id":1322,"title":"Bioinformatics Analyst","company":"Los Angeles Biotech Corp","city":"Los Angeles","state":"CA","lat":34.06133,"lng":-118.4393,"category":"Job","experience":"Mid-Level"},{"id":1323,"title":"Laboratory Technician","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.66464,"lng":-111.04916,"category":"Job","experience":"Entry-Level"},{"id":1324,"title":"Principal Research Scientist","company":"New York Biotech Corp","city":"New York","state":"NY","lat":40.75279,"lng":-73.98151,"category":"Job","experience":"Senior"},{"id":1325,"title":"Summer Research Aide","company":"St. Louis Biotech Corp","city":"St. Louis","state":"MO","lat":38.6486,"lng":-90.31088,"category":"Summer","experience":"Senior"},{"id":1326,"title":"Quality Assurance Manager","company":"San Diego Biotech Corp","city":"San Diego","state":"CA","lat":32.83095,"lng":-117.14109,"category":"Job","experience":"Senior"},{"id":1327,"title":"Cell Culture Technician","company":"Fargo Biotech Corp","city":"Fargo","state":"ND","lat":46.92019,"lng":-96.8193,"category":"Job","experience":"Entry-Level"},{"id":1328,"title":"Laboratory Technician Certificate","company":"Fargo Bio Training Center","city":"Fargo","state":"ND","lat":46.91887,"lng":-96.81972,"category":"Certificate","experience":"Entry-Level"},{"id":1329,"title":"Regulatory Affairs Certificate","company":"Portland Bio Training Center","city":"Portland","state":"OR","lat":45.51143,"lng":-122.62275,"category":"Certificate","experience":"Mid-Level"},{"id":1330,"title":"Senior Scientist","company":"Palo Alto Biotech Corp","city":"Palo Alto","state":"CA","lat":37.42611,"lng":-122.17153,"category":"Job","experience":"Senior"},{"id":1331,"title":"Clinical Research Intern","company":"San Diego Biotech Corp","city":"San Diego","state":"CA","lat":32.74675,"lng":-117.1611,"category":"Internship","experience":"Entry-Level"},{"id":1332,"title":"QC Lab Analyst I","company":"Spokane Biotech Corp","city":"Spokane","state":"WA","lat":47.7105,"lng":-117.43021,"category":"Job","experience":"Entry-Level"},{"id":1333,"title":"Research Assistant","company":"Minneapolis Biotech Corp","city":"Minneapolis","state":"MN","lat":44.93892,"lng":-93.21948,"category":"Job","experience":"Entry-Level"},{"id":1335,"title":"Regulatory Affairs Specialist","company":"St. Paul Biotech Corp","city":"St. Paul","state":"MN","lat":44.96378,"lng":-93.17201,"category":"Job","experience":"Mid-Level"},{"id":1336,"title":"Clinical Research Coordinator Certificate","company":"Atlanta Bio Training Center","city":"Atlanta","state":"GA","lat":33.83913,"lng":-84.38167,"category":"Certificate","experience":"Mid-Level"},{"id":1338,"title":"Laboratory Technician Certificate","company":"Spokane Bio Training Center","city":"Spokane","state":"WA","lat":47.66612,"lng":-117.40147,"category":"Certificate","experience":"Senior"},{"id":1339,"title":"Summer Biomanufacturing Trainee","company":"Burlington Biotech Corp","city":"Burlington","state":"VT","lat":44.48526,"lng":-73.18641,"category":"Summer","experience":"Entry-Level"},{"id":1340,"title":"Clinical Trial Coordinator","company":"Austin Biotech Corp","city":"Austin","state":"TX","lat":30.26631,"lng":-97.74199,"category":"Job","experience":"Mid-Level"},{"id":1341,"title":"B.S. in Biomedical Sciences","company":"Tucson Biotech Institute","city":"Tucson","state":"AZ","lat":32.24077,"lng":-110.94468,"category":"University","experience":"Entry-Level"},{"id":1342,"title":"Manufacturing Intern","company":"Las Vegas Biotech Corp","city":"Las Vegas","state":"NV","lat":36.16916,"lng":-115.29958,"category":"Internship","experience":"Entry-Level"},{"id":1343,"title":"Bioinformatics Analyst","company":"Raleigh Biotech Corp","city":"Raleigh","state":"NC","lat":35.77957,"lng":-78.63718,"category":"Job","experience":"Mid-Level"},{"id":1344,"title":"Research Associate II","company":"Fresno Biotech Corp","city":"Fresno","state":"CA","lat":36.73939,"lng":-119.78581,"category":"Job","experience":"Mid-Level"},{"id":1345,"title":"Bioprocess Technician I","company":"Portland Biotech Corp","city":"Portland","state":"OR","lat":45.5131,"lng":-122.62309,"category":"Job","experience":"Entry-Level"},{"id":1346,"title":"QC Microbiology Analyst","company":"Boston Biotech Corp","city":"Boston","state":"MA","lat":42.33592,"lng":-71.10186,"category":"Job","experience":"Mid-Level"},{"id":1347,"title":"Quality Assurance Manager","company":"Denville Biotech Corp","city":"Denville","state":"NJ","lat":40.89383,"lng":-74.47558,"category":"Job","experience":"Senior"},{"id":1348,"title":"Manufacturing Intern","company":"St. Louis Biotech Corp","city":"St. Louis","state":"MO","lat":38.62714,"lng":-90.23153,"category":"Internship","experience":"Mid-Level"},{"id":1349,"title":"Manufacturing Associate","company":"Salt Lake City Biotech Corp","city":"Salt Lake City","state":"UT","lat":40.72269,"lng":-111.85816,"category":"Job","experience":"Entry-Level"},{"id":1350,"title":"Process Development Lead","company":"Denver Biotech Corp","city":"Denver","state":"CO","lat":39.76061,"lng":-105.00797,"category":"Job","experience":"Senior"},{"id":1351,"title":"Clinical Research Coordinator Certificate","company":"Madison Bio Training Center","city":"Madison","state":"WI","lat":43.07154,"lng":-89.44019,"category":"Certificate","experience":"Mid-Level"},{"id":1352,"title":"Principal Research Scientist","company":"Bozeman Biotech Corp","city":"Bozeman","state":"MT","lat":45.68544,"lng":-111.0756,"category":"Job","experience":"Senior"},{"id":1353,"title":"B.S. in Biomedical Sciences","company":"Denville Biotech Institute","city":"Denville","state":"NJ","lat":40.89995,"lng":-74.46726,"category":"University","experience":"Entry-Level"},{"id":1354,"title":"Manufacturing Intern","company":"Spokane Biotech Corp","city":"Spokane","state":"WA","lat":47.67159,"lng":-117.23994,"category":"Internship","experience":"Entry-Level"},{"id":1355,"title":"Senior Bioprocess Engineer","company":"Eugene Biotech Corp","city":"Eugene","state":"OR","lat":44.06026,"lng":-123.10128,"category":"Job","experience":"Senior"},{"id":1356,"title":"Clinical Operations Lead","company":"Boulder Biotech Corp","city":"Boulder","state":"CO","lat":40.04929,"lng":-105.21,"category":"Job","experience":"Senior"},{"id":1357,"title":"Bioinformatics Analyst","company":"Miami Biotech Corp","city":"Miami","state":"FL","lat":25.77179,"lng":-80.22929,"category":"Job","experience":"Mid-Level"},{"id":2001,"title":"Lab Assistant Intern","company":"Lakeview Pharmaceuticals","city":"Morris Plains","state":"NJ","lat":40.862,"lng":-74.425,"category":"Internship","experience":"Entry-Level","pay":"$18.50 / hr","summary":"Prepare laboratory samples, keep detailed testing records, and maintain equipment logs.","requirements":["High school diploma or active senior status.","Attention to detail.","Basic computer literacy."]},{"id":2002,"title":"Quality Control Helper","company":"Lakeview Pharmaceuticals","city":"Morris Plains","state":"NJ","lat":40.8628,"lng":-74.4262,"category":"Internship","experience":"Entry-Level","pay":"$19.75 / hr","summary":"Assist senior chemists with product check protocols and documentation logs.","requirements":["High school chemistry or biology coursework.","Good communication."]},{"id":2003,"title":"Biomanufacturing Junior Tech","company":"BioTech Innovations Lab","city":"Denville","state":"NJ","lat":40.8905,"lng":-74.479,"category":"Job","experience":"Entry-Level","pay":"$22.50 / hr","summary":"Monitor bioreactor conditions, sterilize equipment, and log daily research metrics.","requirements":["Vocational certificate or high school diploma.","Interest in bio-manufacturing."]},{"id":2004,"title":"Clinical Trial Research Assistant Certificate","company":"Morris Science Institute","city":"Randolph","state":"NJ","lat":40.849,"lng":-74.576,"category":"Certificate","experience":"Entry-Level","pay":"Tuition sponsored","summary":"8-week intensive hands-on training preparing graduates for clinical trial operations.","requirements":["High school diploma or GED."]},{"id":2005,"title":"Summer Environmental Bio-Aide","company":"EcoLife Research Labs","city":"Parsippany","state":"NJ","lat":40.841,"lng":-74.418,"category":"Summer","experience":"Entry-Level","pay":"$17.50 / hr","summary":"Collect soil and aquatic biological samples across research locations in Morris County.","requirements":["Enthusiasm for outdoor bio-research.","Dependable team player."]},{"id":2006,"title":"B.S. in Life Sciences & Biotechnology","company":"Fairleigh Dickinson University","city":"Madison","state":"NJ","lat":40.76,"lng":-74.396,"category":"University","experience":"Entry-Level","pay":"Financial aid available","summary":"4-year undergraduate degree program featuring guaranteed laboratory industry internships.","requirements":["High school transcript submission."]},{"id":2007,"title":"High School STEM Research Scholar","company":"Novartis Biomedical Hub","city":"East Hanover","state":"NJ","lat":40.813,"lng":-74.399,"category":"Internship","experience":"Entry-Level","pay":"$20.00 / hr","summary":"Work alongside senior molecular biologists in active cellular research labs.","requirements":["Enrolled in 11th or 12th grade.","STEM teacher recommendation."]},{"id":2008,"title":"Sample Inventory Coordinator","company":"Bayer Consumer Health US","city":"Whippany","state":"NJ","lat":40.823,"lng":-74.417,"category":"Job","experience":"Entry-Level","pay":"$21.00 / hr","summary":"Log biomedical testing samples into database systems and organize cold-storage vaults.","requirements":["High school diploma.","Strong organizational skills."]},{"id":2009,"title":"A.S. in Biotechnology","company":"County College of Morris - Biology Dept.","city":"Randolph","state":"NJ","lat":40.8655,"lng":-74.5688,"category":"University","experience":"Entry-Level","pay":"Affordable in-county tuition","summary":"2-year associate degree program directly linked with local pharmaceutical job placements.","requirements":["Open admission for high school graduates."]},{"id":2010,"title":"Clinical Specimen Processor","company":"Morristown Medical Center Research","city":"Morristown","state":"NJ","lat":40.7915,"lng":-74.466,"category":"Job","experience":"Entry-Level","pay":"$20.50 / hr","summary":"Receive, centrifuge, and catalog biological specimens for hospital laboratory analysis.","requirements":["High school diploma or equivalent.","Shift flexibility."]},{"id":2011,"title":"RISE Summer Bio Apprentice","company":"Drew University Science Center","city":"Madison","state":"NJ","lat":40.759,"lng":-74.415,"category":"Summer","experience":"Entry-Level","pay":"$18.00 / hr","summary":"Participate in hands-on summer research guided by retired industrial scientists.","requirements":["Interest in biological research."]},{"id":2012,"title":"DNA Sequencing Lab Aide","company":"Azenta Life Sciences (GENEWIZ)","city":"South Plainfield","state":"NJ","lat":40.576,"lng":-74.42,"category":"Job","experience":"Entry-Level","pay":"$21.50 / hr","summary":"Prepare genomic reaction plates and run automated capillary electrophoresis instruments.","requirements":["High school diploma.","Basic lab safety knowledge."]},{"id":2013,"title":"Biomanufacturing Quality Trainee","company":"Sanofi US Headquarters","city":"Bridgewater","state":"NJ","lat":40.5926,"lng":-74.6288,"category":"Internship","experience":"Entry-Level","pay":"$19.50 / hr","summary":"Inspect sterile packaging lines and assist quality auditors with batch record entries.","requirements":["Active high school senior or recent graduate."]},{"id":2014,"title":"Cleanroom Tech Certification","company":"ON3 BioTech Innovation Campus","city":"Nutley","state":"NJ","lat":40.821,"lng":-74.153,"category":"Certificate","experience":"Entry-Level","pay":"Sponsored training stipend","summary":"4-week hands-on certification course covering gowning procedures and cleanroom protocols.","requirements":["High school diploma or GED."]},{"id":2015,"title":"Medical Device Assembly Intern","company":"Johnson & Johnson Innovation Hub","city":"New Brunswick","state":"NJ","lat":40.493,"lng":-74.445,"category":"Internship","experience":"Entry-Level","pay":"$19.00 / hr","summary":"Assemble surgical diagnostic instruments under sterile micro-assembly conditions.","requirements":["Good dexterity and focus."]},{"id":2016,"title":"B.S. in Bio-Molecular Engineering","company":"Rutgers Center for Advanced Biotechnology","city":"Piscataway","state":"NJ","lat":40.522,"lng":-74.462,"category":"University","experience":"Entry-Level","pay":"Scholarships available","summary":"Premier state university program with state-of-the-art bio-foundry research labs.","requirements":["High school application."]}];
+
+
+      // =====================================================================
+      //  DETAILED JOB SUMMARIES
+      //  Builds an overview, duties, requirements, skills, pay and growth path
+      //  for every pin from its title + category + experience level.
+      //  Pins that carry their own `summary` / `requirements` / `pay` use those.
+      // =====================================================================
+      const FAMILIES = [
+        { re: /gene therapy|cell therapy|cellular therapy|stem cell|car-t/i, name: "cell and gene therapy",
+          what: "Work with living cells and genetic material that are being developed into new treatments.",
+          duties: ["Grow, handle and monitor cell cultures under sterile conditions", "Run assays and record results in lab notebooks or electronic systems", "Follow written procedures (SOPs) and report any deviations", "Help prepare batches and materials for the next stage of testing"],
+          skills: ["Aseptic technique", "Cell culture", "Documentation", "Teamwork"], growth: "Research associate, process development scientist, then manufacturing or lab lead." },
+        { re: /mrna|rna|enzyme|protein|proteomic|chemistry/i, name: "molecular biology and RNA/protein science",
+          what: "Make, purify and measure the molecules (RNA, DNA, proteins, enzymes) that power modern drugs and diagnostics.",
+          duties: ["Prepare reagents and set up reactions", "Purify and quantify samples with lab instruments", "Record data accurately and check it against targets", "Keep equipment calibrated and the work area compliant"],
+          skills: ["Pipetting accuracy", "Lab math", "Data logging", "Safety practices"], growth: "Senior technician, research scientist, then group leader." },
+        { re: /bioinformatic|computational|data engineer|genomic|sequenc|analytics|analyst/i, name: "data and genomics",
+          what: "Turn large biological data sets (DNA sequences, lab measurements, trial results) into answers scientists can act on.",
+          duties: ["Clean and organize experiment or sequencing data", "Run analysis scripts and build charts or dashboards", "Explain findings to lab and clinical teams", "Document methods so results can be repeated"],
+          skills: ["Python or R basics", "Spreadsheets and statistics", "Biology fundamentals", "Clear writing"], growth: "Data analyst, bioinformatics scientist, then data science lead." },
+        { re: /quality|qc|qa|pharma quality|regulatory/i, name: "quality and compliance",
+          what: "Make sure every product and record meets strict safety and regulatory standards before it reaches patients.",
+          duties: ["Test samples and compare results to specifications", "Review batch records and logs for accuracy", "Document and investigate any out-of-range result", "Support audits and keep records inspection-ready"],
+          skills: ["Attention to detail", "Good documentation practice (GDP)", "Basic chemistry or micro lab skills", "Communication"], growth: "QC analyst, QA specialist, then quality manager." },
+        { re: /manufactur|bioprocess|process|cleanroom|biomanufactur|gmp/i, name: "biomanufacturing",
+          what: "Operate and monitor the equipment that produces medicines at scale, in tightly controlled clean environments.",
+          duties: ["Set up and monitor bioreactors and purification equipment", "Follow gowning and cleanroom procedures", "Record process readings throughout each batch", "Clean and sterilize equipment between runs"],
+          skills: ["Following procedures exactly", "Mechanical aptitude", "Monitoring instruments", "Shift teamwork"], growth: "Technician II, process specialist, then production supervisor or engineer." },
+        { re: /clinical|trial|specimen|patient|translational|precision/i, name: "clinical research",
+          what: "Support studies and hospital labs that test whether treatments and diagnostics are safe and effective.",
+          duties: ["Receive, label and track specimens or study records", "Enter data into study databases", "Follow privacy and safety rules for patient information", "Coordinate schedules with the study team"],
+          skills: ["Organization", "Accuracy under time pressure", "Privacy awareness", "Communication"], growth: "Research assistant, study coordinator, then clinical operations manager." },
+        { re: /agricultur|agbio|plant|environment|marine|crop/i, name: "agricultural and environmental biotech",
+          what: "Apply biotechnology to crops, soil, water and ocean life to improve food, sustainability and ecosystems.",
+          duties: ["Collect field or water samples and label them correctly", "Run lab tests on plant, soil or water samples", "Log environmental conditions and results", "Help maintain greenhouse, field or aquatic study sites"],
+          skills: ["Field sampling", "Observation", "Data recording", "Comfort working outdoors"], growth: "Field technician, research associate, then project scientist." },
+        { re: /device|cardio|assembly|medtronic|surgical|diagnostic/i, name: "medical devices",
+          what: "Build and test the instruments and devices doctors use to diagnose and treat patients.",
+          duties: ["Assemble components following detailed work instructions", "Inspect parts and finished devices for defects", "Test performance and record measurements", "Work in clean, controlled assembly areas"],
+          skills: ["Fine motor skills", "Reading technical drawings", "Inspection", "Focus"], growth: "Assembler, test technician, then manufacturing or quality engineer." },
+      ];
+      const RESEARCH_FAMILY = { name: "laboratory research",
+          what: "Help scientists investigate diseases and develop new therapies by running experiments and analyzing results.",
+          duties: ["Prepare samples, solutions and equipment", "Carry out experiments from written protocols", "Record observations and results carefully", "Present findings to the research team"],
+          skills: ["Lab safety", "Careful measurement", "Note-taking", "Curiosity"], growth: "Research assistant, research associate, then scientist." };
+
+      function pickFamily(pin) {
+        const t = (pin.title + ' ' + pin.company).toLowerCase();
+        return FAMILIES.find(f => f.re.test(t)) || RESEARCH_FAMILY;
+      }
+
+      function getDetails(pin) {
+        const fam = pickFamily(pin);
+        const cat = pin.category, exp = pin.experience || 'Entry-Level';
+        const where = `${pin.city}, ${pin.state}`;
+        let overview, duties = fam.duties, reqs, pay, schedule, growth = fam.growth, skills = fam.skills;
+
+        const eduByExp = { 'Entry-Level': "High school diploma or GED; a biology/chemistry course is a plus.", 'Mid-Level': "Associate or bachelor's degree in a life science, or 2–4 years of relevant lab experience.", 'Senior': "Bachelor's, master's or PhD in a life science plus 5+ years of experience." };
+        const payByCat = { Job: { 'Entry-Level': "$20–28 per hour", 'Mid-Level': "$70,000–105,000 per year", 'Senior': "$115,000–165,000 per year" }, Internship: "$18–24 per hour", Summer: "$17–22 per hour" };
+
+        if (cat === 'University') {
+          overview = `${pin.title} at ${pin.company} (${where}). A degree path for students who want a career in ${fam.name}.`;
+          duties = ["Take core courses in biology, chemistry and math", "Complete lab courses and hands-on projects", "Apply for co-ops, internships or research with faculty", "Build a portfolio for jobs or graduate school"];
+          reqs = [exp === 'Senior' ? "Bachelor's degree in a related science and strong academic record." : exp === 'Mid-Level' ? "Bachelor's degree or equivalent for graduate programs." : "High school transcript and application.", "Application essay or recommendation letters (varies by school)."];
+          pay = "Tuition and aid vary — check the school's financial aid office";
+          schedule = pin.title.includes('A.S.') ? "About 2 years, full or part time" : /M\.S\./.test(pin.title) ? "About 2 years" : /Ph\.D/.test(pin.title) ? "4–6 years, usually funded" : "About 4 years, full time";
+          growth = "Graduates move into lab, quality, data or research roles, or continue to graduate school.";
+        } else if (cat === 'Certificate') {
+          overview = `${pin.title} from ${pin.company} (${where}). A short, job-focused training program in ${fam.name}.`;
+          duties = ["Learn lab or industry procedures in short hands-on sessions", "Practice with real equipment and documentation", "Complete a skills check or final assessment", "Get career guidance and employer introductions"];
+          reqs = ["High school diploma or GED.", "Ability to follow written safety rules."];
+          pay = "Program fees or sponsorship vary — confirm with the provider";
+          schedule = "Typically 4–12 weeks, day or evening classes";
+          growth = "Earns a credential that helps qualify for entry-level technician roles.";
+        } else if (cat === 'Internship') {
+          overview = `${pin.title} at ${pin.company} (${where}). Learn on the job in ${fam.name} while supporting a working team.`;
+          reqs = ["Currently enrolled in high school or college, or a recent graduate.", "Interest in science plus basic computer skills.", "Reliable attendance and willingness to learn."];
+          pay = payByCat.Internship; schedule = "Part time during the school year or full time in summer";
+          growth = "Interns often return for summer roles or apply for entry-level jobs. " + fam.growth;
+        } else if (cat === 'Summer') {
+          overview = `${pin.title} at ${pin.company} (${where}). A seasonal role that introduces ${fam.name} over the summer.`;
+          reqs = ["Interest in biology, chemistry or environmental science.", "Age or school-status requirements vary (often 16+).", "Dependable team player."];
+          pay = payByCat.Summer; schedule = "6–10 weeks, typically June–August";
+          growth = "Strong summer performers can be invited back or referred to internships.";
+        } else {
+          overview = `${pin.title} at ${pin.company} (${where}). ${fam.what}`;
+          reqs = [eduByExp[exp] || eduByExp['Entry-Level'], "Strong attention to detail and willingness to follow procedures.", exp === 'Senior' ? "Experience leading projects or mentoring others." : "Comfortable working in a team."];
+          pay = (payByCat.Job[exp] || payByCat.Job['Entry-Level']);
+          schedule = "Full time, on site; some roles include shift work";
+        }
+
+        // Use the group's own written content when a pin provides it
+        if (pin.summary) overview = `${pin.summary} (${pin.company}, ${where}).`;
+        if (pin.requirements) reqs = pin.requirements;
+        const payIsExact = !!pin.pay;
+        if (pin.pay) pay = pin.pay;
+
+        const short = pin.summary || (overview.split('. ')[1] ? overview.split('. ').slice(1).join('. ') : overview);
+        return { overview, short, duties, reqs, pay, payIsExact, schedule, growth, skills, level: exp, family: fam.name };
+      }
+
+      function escHTML(t) { return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+      function renderDetailsHTML(pin, compact) {
+        const d = getDetails(pin);
+        const li = arr => arr.map(x => `<li>${escHTML(x)}</li>`).join('');
+        return `
+          <p class="jd-overview">${escHTML(d.overview)}</p>
+          <div class="jd-facts">
+            <div class="jd-fact"><b>Experience level</b><span>${escHTML(d.level)}</span></div>
+            <div class="jd-fact"><b>${d.payIsExact ? 'Pay / cost' : 'Typical pay / cost (estimate)'}</b><span>${escHTML(d.pay)}</span></div>
+            <div class="jd-fact"><b>Schedule</b><span>${escHTML(d.schedule)}</span></div>
+            <div class="jd-fact"><b>Field</b><span>${escHTML(d.family)}</span></div>
+          </div>
+          <div><h5>${pin.category === 'University' ? 'What you will study' : pin.category === 'Certificate' ? 'What you will learn' : 'What you will do'}</h5><ul>${li(d.duties)}</ul></div>
+          <div><h5>Requirements</h5><ul>${li(d.reqs)}</ul></div>
+          <div><h5>Skills you will build</h5><div class="jd-skills">${d.skills.map(x => `<span>${escHTML(x)}</span>`).join('')}</div></div>
+          <div><h5>Where it can lead</h5><p>${escHTML(d.growth)}</p></div>
+          <p class="jd-note">Sample listing created for this school project. Pay, schedule and requirements are typical estimates, so confirm the details with the employer or school before applying.</p>`;
+      }
+
+      function pinPopupHTML(pin) {
+        const style = catColors[pin.category] || catColors['Job'];
+        const d = getDetails(pin);
+        return `
+            <div style="padding:4px; font-family:var(--font-family); max-width:260px;">
+              <span class="card-category-pill" style="background:${style.bg}; color:${style.text}; font-weight:800; font-size:10px;">${escHTML(pin.category)}</span>
+              <div style="font-size:14px; font-weight:800; margin-top:4px;">${escHTML(pin.title)}</div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">${escHTML(pin.company)} • ${escHTML(pin.city)}, ${escHTML(pin.state)}</div>
+              <div style="font-size:12px; line-height:1.45; margin-bottom:6px;">${escHTML(d.short)}</div>
+              <div style="font-size:11px; font-weight:800; color:var(--accent-green);">${escHTML(d.pay)}${d.payIsExact ? '' : ' (est.)'}</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button onclick="openAtlasDrawer(${pin.id})" style="background:#0f766e;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:800;font-size:11px;">Full summary &amp; apply</button><button onclick="openJobModal(${pin.id})" style="background:var(--accent-green); color:#fff; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:800; font-size:11px;">Commute</button></div>
+            </div>
+          `;
+      }
+
+      // AUTOCOMPLETE AUTO-CORRECT LOGIC
+      const originInput = document.getElementById("user-origin-input");
+      const suggestionsBox = document.getElementById("origin-suggestions");
+
+      originInput.addEventListener("input", () => {
+        const val = originInput.value.toLowerCase().trim();
+        if (!val) {
+          suggestionsBox.classList.remove("active");
+          return;
+        }
+
+        // Search matches and format capitalizing properly
+        const matches = US_TOWNS.filter(t => t.toLowerCase().includes(val)).slice(0, 8);
+
+        if (matches.length > 0) {
+          suggestionsBox.innerHTML = matches.map(m => `
+            <div class="autocomplete-item" data-val="${m}">
+              <i class="fa-solid fa-location-dot" style="color:var(--accent-green)"></i>
+              <span>${m}</span>
+            </div>
+          `).join('');
+          suggestionsBox.classList.add("active");
+
+          document.querySelectorAll(".autocomplete-item").forEach(item => {
+            item.addEventListener("click", () => {
+              originInput.value = item.getAttribute("data-val");
+              suggestionsBox.classList.remove("active");
+            });
+          });
+        } else {
+          suggestionsBox.classList.remove("active");
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!originInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+          suggestionsBox.classList.remove("active");
+        }
+      });
+
+      // Haversine distance formula in miles
+      function calculateDistanceMiles(lat1, lon1, lat2, lon2) {
+        const R = 3958.8;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+      }
+
+      // Tab Navigation Logic
+      const navButtons = document.querySelectorAll('.nav-tab-btn');
+      const tabViews = document.querySelectorAll('.tab-view');
+      let map, markersCluster;
+
+      window.switchTab = (tabId) => {
+        navButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId));
+        tabViews.forEach(view => view.classList.toggle('active', view.id === tabId));
+
+        if (tabId === 'map-tab') {
+          if (!map) initMap();
+          setTimeout(() => map.invalidateSize(), 150);
+        }
+      };
+
+      navButtons.forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab'))));
+
+      // Category Styles
+      const catColors = {
+        'Job': { bg: 'var(--color-job-bg)', text: 'var(--color-job-text)', border: 'var(--color-job-border)', icon: '💼' },
+        'Internship': { bg: 'var(--color-intern-bg)', text: 'var(--color-intern-text)', border: 'var(--color-intern-border)', icon: '🧪' },
+        'University': { bg: 'var(--color-univ-bg)', text: 'var(--color-univ-text)', border: 'var(--color-univ-border)', icon: '🎓' },
+        'Certificate': { bg: 'var(--color-cert-bg)', text: 'var(--color-cert-text)', border: 'var(--color-cert-border)', icon: '📜' },
+        'Summer': { bg: 'var(--color-summer-bg)', text: 'var(--color-summer-text)', border: 'var(--color-summer-border)', icon: '☀️' }
+      };
+
+      // Populate Home Featured Cards
+      const featuredContainer = document.getElementById("featured-cards-container");
+      pinData.slice(0, 12).forEach(pos => {
+        const style = catColors[pos.category] || catColors['Job'];
+        const cardHTML = `
+          <div class="position-card">
+            <div>
+              <div class="card-top">
+                <span class="card-category-pill" style="background:${style.bg}; color:${style.text}; border:1px solid ${style.border};">
+                  ${style.icon} ${pos.category}
+                </span>
+                <span style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">
+                  <i class="fa-solid fa-location-dot"></i> ${pos.city}, ${pos.state}
+                </span>
+              </div>
+              <div class="card-job-title">${pos.title}</div>
+              <div class="card-company-name">${pos.company}</div>
+              <div class="card-summary-line">${getDetails(pos).short}</div>
+            </div>
+            <div class="card-footer">
+              <span style="font-weight:800; font-size:0.8rem; color:var(--text-muted);">${pos.experience}</span>
+              <button class="card-view-btn" onclick="openJobModal(${pos.id})">Details & Commute</button>
+            </div>
+          </div>
+        `;
+        featuredContainer.insertAdjacentHTML('beforeend', cardHTML);
+      });
+
+      // Category buttons are multi-select toggles: click once to include a type,
+      // click again to remove it. With none selected, all types are shown.
+      let atlasSelectedTypes = new Set();
+      function syncTypeButtons() {
+        document.querySelectorAll('.atlas-type-pill').forEach(btn => {
+          const type = btn.dataset.type;
+          btn.classList.toggle('active', type === 'All' ? atlasSelectedTypes.size === 0 : atlasSelectedTypes.has(type));
+          btn.setAttribute('aria-pressed', String(type === 'All' ? atlasSelectedTypes.size === 0 : atlasSelectedTypes.has(type)));
+        });
+        const catSelect = document.getElementById('categoryFilter');
+        if (catSelect) catSelect.value = atlasSelectedTypes.size === 1 ? [...atlasSelectedTypes][0] : 'All';
+      }
+      function toggleOpportunityType(type) {
+        if (type === 'All') atlasSelectedTypes.clear();
+        else if (atlasSelectedTypes.has(type)) atlasSelectedTypes.delete(type);
+        else atlasSelectedTypes.add(type);
+        syncTypeButtons();
+        if (typeof applyFilters === 'function') applyFilters();
+      }
+      window.openMapCategory = (cat) => {
+        switchTab('map-tab');
+        toggleOpportunityType(cat);
+        if (map) setTimeout(() => map.invalidateSize(), 120);
+      };
+
+      // Custom Dynamic Pin Marker Icon
+      function createCustomIcon(cat) {
+        const style = catColors[cat] || catColors['Job'];
+        return L.divIcon({
+          className: 'custom-pin-wrapper',
+          html: `<div class="custom-pin-badge" style="background:${style.bg}; border:2px solid ${style.border}; color:${style.text};">${style.icon} ${cat}</div>`,
+          iconSize: null,
+          iconAnchor: [40, 15]
+        });
+      }
+
+      // Initialize Leaflet Map
+      function initMap() {
+        map = L.map('map', {
+          center: [20, 0],
+          zoom: 2,
+          minZoom: 2, // Zoom-out limiter: prevent zooming farther out than the full-world view.
+          zoomControl: false,
+          // Allow horizontal panning across repeated world copies.
+          worldCopyJump: false
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          noWrap: false,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        markersCluster = L.markerClusterGroup({
+          maxClusterRadius: 40,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true
+        });
+
+        map.addLayer(markersCluster);
+        renderMarkers(pinData);
+        // Rebuild marker copies whenever the user pans, so every repeated world
+        // visible at any horizontal distance gets its own matching set of points.
+        map.on('moveend', () => renderMarkers(currentFilteredPins));
+      }
+
+      let currentFilteredPins = pinData;
+
+      function getVisibleWorldOffsets() {
+        if (!map) return [0];
+        const bounds = map.getBounds();
+        const west = bounds.getWest();
+        const east = bounds.getEast();
+        // Include all world-copy shifts intersecting the current viewport,
+        // plus one world on either side to avoid gaps while dragging.
+        const minCopy = Math.floor((west - 180) / 360) - 1;
+        const maxCopy = Math.ceil((east + 180) / 360) + 1;
+        const offsets = [];
+        for (let copy = minCopy; copy <= maxCopy; copy++) offsets.push(copy * 360);
+        return offsets;
+      }
+
+      function renderMarkers(filteredPins) {
+        if (!markersCluster) return;
+        currentFilteredPins = filteredPins;
+        markersCluster.clearLayers();
+
+        filteredPins.forEach(pin => {
+          const style = catColors[pin.category] || catColors['Job'];
+          // Add marker copies for every repeated world currently visible, even
+          // after the user has dragged across many Americas in either direction.
+          const worldOffsets = getVisibleWorldOffsets();
+          const popupHTML = pinPopupHTML(pin);
+          
+          worldOffsets.forEach(offset => {
+            const marker = L.marker([pin.lat, pin.lng + offset], { icon: createCustomIcon(pin.category) });
+            marker.bindPopup(popupHTML);
+            markersCluster.addLayer(marker);
+          });
+        });
+
+        document.getElementById('pinCount').innerText = `${filteredPins.length} ACTIVE PINS`;
+      }
+
+      // Map Filtering
+      const searchInput = document.getElementById('searchInput');
+      const clearBtn = document.getElementById('clearBtn');
+      const categoryFilter = document.getElementById('categoryFilter');
+      const expFilter = document.getElementById('expFilter');
+
+      function applyFilters() {
+        const query = searchInput.value.toLowerCase().trim();
+        const selectedCat = categoryFilter.value;
+        const selectedExp = expFilter.value;
+
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+
+        const filtered = pinData.filter(pin => {
+          const matchesSearch = !query || pin.title.toLowerCase().includes(query) ||
+                                pin.company.toLowerCase().includes(query) ||
+                                pin.city.toLowerCase().includes(query) ||
+                                pin.state.toLowerCase().includes(query);
+
+          const matchesCat = selectedCat === 'All' || pin.category === selectedCat;
+          const matchesExp = selectedExp === 'All' || pin.experience === selectedExp;
+
+          const matchesType = atlasSelectedTypes.size === 0 || atlasSelectedTypes.has(pin.category);
+          return matchesSearch && matchesCat && matchesExp && matchesType;
+        });
+
+        renderMarkers(filtered);
+      }
+
+      searchInput.addEventListener('input', applyFilters);
+      categoryFilter.addEventListener('change', () => {
+        atlasSelectedTypes.clear();
+        if (categoryFilter.value !== 'All') atlasSelectedTypes.add(categoryFilter.value);
+        syncTypeButtons();
+        applyFilters();
+      });
+      expFilter.addEventListener('change', applyFilters);
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        applyFilters();
+      });
+
+      // Commute Modal Calculation with Dynamic Geocoding
+      window.openJobModal = async (id) => {
+        const pos = pinData.find(p => p.id === id);
+        if (!pos) return;
+
+        let originText = document.getElementById("user-origin-input").value.trim() || "Denville, NJ";
+        originText = toProperCase(originText);
+
+        let searchKey = originText.toLowerCase();
+        if (!searchKey.endsWith(", nj") && !searchKey.includes(",")) {
+          searchKey += ", nj";
+        }
+
+        let originCoords = KNOWN_LOCATIONS[searchKey] || KNOWN_LOCATIONS[originText.toLowerCase()];
+
+        // Fallback to OpenStreetMap Geocoding if not pre-mapped
+        if (!originCoords) {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(originText)}`);
+            const data = await res.json();
+            if (data && data.length > 0) {
+              originCoords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+            } else {
+              originCoords = [40.8923, -74.4774]; // Default to Denville, NJ
+            }
+          } catch (err) {
+            originCoords = [40.8923, -74.4774];
+          }
+        }
+
+        const distMiles = calculateDistanceMiles(originCoords[0], originCoords[1], pos.lat, pos.lng);
+        const style = catColors[pos.category] || catColors['Job'];
+
+        document.getElementById("modal-origin-display").textContent = originText;
+        document.getElementById("modal-category-pill").textContent = pos.category.toUpperCase();
+        document.getElementById("modal-category-pill").style.background = style.bg;
+        document.getElementById("modal-category-pill").style.color = style.text;
+        document.getElementById("modal-position-title").textContent = pos.title;
+        document.getElementById("modal-company-name").textContent = `${pos.company} • ${pos.city}, ${pos.state}`;
+        document.getElementById("modal-description").innerHTML = renderDetailsHTML(pos);
+
+        document.querySelectorAll('.commute-mode-card').forEach(c => c.classList.remove('best-recommendation'));
+
+        // 1. Driving Calc
+        const driveMins = Math.round((distMiles / 45) * 60);
+        const driveGasCost = (distMiles / 28 * 3.50).toFixed(2);
+        document.getElementById("commute-drive-dist").textContent = `${Math.round(distMiles)} miles`;
+        document.getElementById("commute-drive-time").textContent = driveMins < 60 ? `~${driveMins} mins` : `~${(driveMins/60).toFixed(1)} hrs`;
+        document.getElementById("commute-drive-cost").textContent = `~$${driveGasCost} Gas`;
+
+        // 2. Bus/Train Calc
+        if (distMiles < 50) {
+          document.getElementById("commute-transit-time").textContent = `~${Math.round(driveMins * 1.25)} mins`;
+          document.getElementById("commute-transit-cost").textContent = `$${(Math.max(3.50, distMiles * 0.25)).toFixed(2)} Fare`;
+          document.getElementById("commute-transit-route").textContent = "Local Bus / Rail";
+          if (distMiles <= 50) document.getElementById('card-mode-drive').classList.add('best-recommendation');
+        } else if (distMiles < 250) {
+          document.getElementById("commute-transit-time").textContent = `~${(distMiles / 35).toFixed(1)} hrs`;
+          document.getElementById("commute-transit-cost").textContent = `$${(distMiles * 0.35).toFixed(2)} Ticket`;
+          document.getElementById("commute-transit-route").textContent = "Amtrak / Express Bus";
+          document.getElementById('card-mode-transit').classList.add('best-recommendation');
+        } else {
+          document.getElementById("commute-transit-time").textContent = "Overnight";
+          document.getElementById("commute-transit-cost").textContent = "$85 - $140 Ticket";
+          document.getElementById("commute-transit-route").textContent = "Interstate Greyhound / Amtrak";
+        }
+
+        // 3. Flight Calc
+        if (distMiles > 200) {
+          const flightHours = (distMiles / 450) + 2.5;
+          const estFlightPrice = Math.round(120 + (distMiles * 0.12));
+          document.getElementById("commute-plane-time").textContent = `~${flightHours.toFixed(1)} hrs`;
+          document.getElementById("commute-plane-cost").textContent = `$${estFlightPrice} Est Flight`;
+          document.getElementById("commute-plane-detail").textContent = "Commercial Flight";
+          document.getElementById('card-mode-flight').classList.add('best-recommendation');
+        } else {
+          document.getElementById("commute-plane-time").textContent = "N/A";
+          document.getElementById("commute-plane-cost").textContent = "N/A";
+          document.getElementById("commute-plane-detail").textContent = "Drive or Train Preferred";
+        }
+
+        document.getElementById("google-maps-route-btn").href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(originText)}&destination=${encodeURIComponent(pos.city + " " + pos.state + " " + pos.company)}`;
+
+        document.getElementById("job-modal").classList.add("active");
+      };
+
+      document.getElementById("close-modal-btn").addEventListener("click", () => {
+        document.getElementById("job-modal").classList.remove("active");
+      });
+
+
+      // Extra features merged from the standalone cream/emerald atlas.
+      let atlasSelectedPinId = null;
+      window.atlasFlyTo = (lat,lng,zoom) => { switchTab('map-tab'); if (!map) initMap(); setTimeout(()=>{ if(map) map.flyTo([lat,lng,zoom].slice(0,2),zoom,{duration:1.1}); },180); };
+      window.atlasMapView = (view) => {
+        switchTab('map-tab');
+        if (!map) initMap();
+        setTimeout(() => {
+          if (!map) return;
+          if (view === 'world') map.flyTo([20, 0], 2, {duration: 1.1});
+          else if (view === 'usa') map.flyTo([39.2, -98.5], 4, {duration: 1.1});
+          else if (view === 'denville') map.flyTo([40.8923, -74.4774], 11, {duration: 1.1});
+          else if (view === 'in') map.zoomIn();
+          else if (view === 'out') map.zoomOut();
+        }, 180);
+      };
+      window.openAtlasDrawer = (id) => {
+        const pin = pinData.find(p => String(p.id) === String(id)); if (!pin) return;
+        atlasSelectedPinId = pin.id;
+        const type = pin.category || 'Opportunity';
+        document.getElementById('atlasDrawerType').textContent = `${type} OPPORTUNITY`;
+        document.getElementById('atlasDrawerTitle').textContent = pin.title || 'Biotech opportunity';
+        document.getElementById('atlasDrawerCompany').textContent = pin.company || '';
+        document.getElementById('atlasDrawerLocation').textContent = `${pin.city || ''}, ${pin.state || ''}`;
+        document.getElementById('atlasDrawerExperience').textContent = pin.experience || 'Not specified';
+        document.getElementById('atlasDrawerCategory').textContent = type;
+        document.getElementById('atlasDrawerDescription').textContent = getDetails(pin).overview;
+        document.getElementById('atlasDrawerDetails').innerHTML = renderDetailsHTML(pin, true);
+        document.getElementById('atlasDetailDrawer').classList.add('open'); document.getElementById('atlasDrawerBackdrop').classList.add('open');
+      };
+      window.closeAtlasDrawer = () => { document.getElementById('atlasDetailDrawer').classList.remove('open'); document.getElementById('atlasDrawerBackdrop').classList.remove('open'); };
+      document.querySelectorAll('.atlas-type-pill').forEach(btn => btn.addEventListener('click', () => {
+        toggleOpportunityType(btn.dataset.type);
+      }));
+      document.getElementById('atlasFastApplyForm').addEventListener('submit', (e) => {
+        e.preventDefault(); const pin = pinData.find(p=>p.id===atlasSelectedPinId); const name=e.target.elements.fullName.value.trim();
+        const toast=document.getElementById('atlasToast'); toast.textContent=`Demo application details validated for ${name}${pin ? ` — ${pin.company}` : ''}. No application was sent.`; toast.classList.add('show');
+        closeAtlasDrawer(); e.target.reset(); setTimeout(()=>toast.classList.remove('show'),4200);
+      });
+      document.getElementById('atlasOpenCommute').addEventListener('click',()=>{ if(atlasSelectedPinId!=null){ closeAtlasDrawer(); openJobModal(atlasSelectedPinId); } });
+      document.addEventListener('keydown',(e)=>{if(e.key==='Escape')closeAtlasDrawer();});
+
+
+      // =====================================================================
+      //  AI ASSISTANT TAB
+      //  - Live mode: calls the Gemini API with the user's own key
+      //  - Offline mode: searches the pins locally (always works)
+      // =====================================================================
+      // The Gemini API key is NOT in this page. It lives in Vercel (Environment Variable
+      // GEMINI_API_KEY) and is used only by the server function in /api/chat.js.
+      const aiStream = document.getElementById('aiStream');
+      const aiInput = document.getElementById('aiInput');
+      const aiSend = document.getElementById('aiSend');
+      let aiHistory = [];
+
+      function setAiStatus(live) {
+        document.getElementById('aiStatus').classList.toggle('live', live);
+        document.getElementById('aiStatusText').textContent = live ? 'Live AI connected' : 'Offline mode (search only)';
+      }
+      setAiStatus(false);
+      document.getElementById('aiStatusText').textContent = 'AI ready';
+
+      function mdToHTML(text) {
+        const lines = escHTML(text).split(/\n/); let html = '', inList = false;
+        lines.forEach(line => {
+          const b = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          const m = b.match(/^\s*[-*•]\s+(.*)/);
+          if (m) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${m[1]}</li>`; }
+          else { if (inList) { html += '</ul>'; inList = false; } if (b.trim()) html += `<p>${b}</p>`; }
+        });
+        if (inList) html += '</ul>';
+        return html;
+      }
+
+      function addAiMsg(who, text, pinsToShow, isTyping) {
+        const row = document.createElement('div');
+        row.className = `ai-msg ${who}`;
+        const chips = (pinsToShow && pinsToShow.length) ? `<div class="ai-results">${pinsToShow.map(p => `<button type="button" class="ai-result-chip" data-id="${p.id}">📍 ${escHTML(p.title)} – ${escHTML(p.city)}, ${escHTML(p.state)}</button>`).join('')}</div>` : '';
+        row.innerHTML = `<div class="ai-avatar"><i class="fa-solid ${who === 'ai' ? 'fa-robot' : 'fa-user'}"></i></div>
+          <div class="ai-bubble">${isTyping ? '<span class="ai-typing"><span></span><span></span><span></span></span>' : (who === 'ai' ? mdToHTML(text) : `<p>${escHTML(text)}</p>`)}${chips}</div>`;
+        aiStream.appendChild(row);
+        row.querySelectorAll('.ai-result-chip').forEach(b => b.addEventListener('click', () => atlasShowPin(b.dataset.id)));
+        aiStream.scrollTop = aiStream.scrollHeight;
+        return row;
+      }
+
+      window.atlasShowPin = (id) => {
+        const pin = pinData.find(p => String(p.id) === String(id)); if (!pin) return;
+        switchTab('map-tab');
+        setTimeout(() => {
+          map.flyTo([pin.lat, pin.lng], 14, { duration: 1.0 });
+          L.popup({ maxWidth: 280 }).setLatLng([pin.lat, pin.lng]).setContent(pinPopupHTML(pin)).openOn(map);
+        }, 250);
+      };
+
+      // ---- local search over the listings ----
+      const STOP = new Set('a an the and or of in on at for to me my i we is are be can do does what which who where how any some near about with from give show find list tell help want need looking look'.split(' '));
+      const STATE_NAMES = { 'new jersey':'NJ','california':'CA','massachusetts':'MA','texas':'TX','north carolina':'NC','new york':'NY','pennsylvania':'PA','maryland':'MD','washington':'WA','colorado':'CO','florida':'FL','illinois':'IL','minnesota':'MN','wisconsin':'WI' };
+      const CAT_WORDS = { job:'Job', jobs:'Job', internship:'Internship', internships:'Internship', intern:'Internship', university:'University', universities:'University', college:'University', colleges:'University', degree:'University', degrees:'University', certificate:'Certificate', certificates:'Certificate', certification:'Certificate', summer:'Summer' };
+      const EXP_WORDS = { entry:'Entry-Level', beginner:'Entry-Level', 'no experience':'Entry-Level', mid:'Mid-Level', senior:'Senior', experienced:'Senior' };
+
+      function originCoords() {
+        const v = (document.getElementById('user-origin-input').value || 'Denville, NJ').trim().toLowerCase();
+        return KNOWN_LOCATIONS[v] || KNOWN_LOCATIONS[v + ', nj'] || KNOWN_LOCATIONS['denville, nj'];
+      }
+      function originLabel() { return document.getElementById('user-origin-input').value.trim() || 'Denville, NJ'; }
+
+      function searchPins(q, limit) {
+        const text = q.toLowerCase();
+        const tokens = text.replace(/[^a-z0-9\s-]/g, ' ').split(/\s+/).filter(t => t && !STOP.has(t));
+        let cat = null, exp = null, st = null;
+        tokens.forEach(t => { if (CAT_WORDS[t]) cat = CAT_WORDS[t]; });
+        Object.keys(EXP_WORDS).forEach(k => { if (text.includes(k)) exp = EXP_WORDS[k]; });
+        Object.keys(STATE_NAMES).forEach(k => { if (text.includes(k)) st = STATE_NAMES[k]; });
+        if (/\bnj\b/.test(text)) st = 'NJ';
+        const near = /near|close|commute|nearby|local/.test(text) || st === 'NJ';
+        const o = originCoords();
+        const scored = pinData.map(p => {
+          const hay = `${p.title} ${p.company} ${p.city} ${p.state} ${p.category} ${getDetails(p).family}`.toLowerCase();
+          let score = 0;
+          tokens.forEach(t => { if (t.length > 2 && hay.includes(t)) score += 2; });
+          if (cat && p.category === cat) score += 4; else if (cat) score -= 3;
+          if (exp && p.experience === exp) score += 3;
+          if (st && p.state === st) score += 4;
+          const dist = calculateDistanceMiles(o[0], o[1], p.lat, p.lng);
+          if (near) score += Math.max(0, 6 - dist / 15);
+          if (p.summary) score += 0.5;
+          return { p, score, dist };
+        }).filter(x => x.score > 0).sort((a, b) => b.score - a.score || a.dist - b.dist);
+        return scored.slice(0, limit).map(x => Object.assign({}, x.p, { _dist: Math.round(x.dist) }));
+      }
+
+      function offlineAnswer(q, matches) {
+        if (!matches.length) return "I could not find a listing that matches that. Try a city, a state, a pathway (job, internship, certificate, university, summer), or an experience level.";
+        const lines = matches.slice(0, 5).map(p => {
+          const d = getDetails(p);
+          return `- **${p.title}** at ${p.company} (${p.city}, ${p.state}, about ${p._dist} mi from ${originLabel()}). ${d.short} ${p.category === 'University' || p.category === 'Certificate' ? 'Cost' : 'Pay'}: ${d.pay}${d.payIsExact ? '' : ' (estimate)'}.`;
+        });
+        return `Here are the best matches I found in the atlas:\n${lines.join('\n')}\nTap a result below to see it on the map. `;
+      }
+
+      async function askGemini(question, matches) {
+        const listings = matches.map(p => {
+          const d = getDetails(p);
+          return `ID ${p.id} | ${p.title} | ${p.company} | ${p.city}, ${p.state} | ${p.category} | ${p.experience} | ~${p._dist} miles from user | pay/cost: ${d.pay} | requirements: ${d.reqs.join(' ')}`;
+        }).join('\n');
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            listings,
+            origin: originLabel(),
+            history: aiHistory.slice(-8).map(m => ({ role: m.role === 'user' ? 'user' : 'model', text: m.text }))
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.text) {
+          const err = new Error(data.error || `HTTP ${res.status}`); err.status = res.status; throw err;
+        }
+        return data.text;
+      }
+
+      async function handleAiSend(preset) {
+        const q = (preset || aiInput.value).trim();
+        if (!q || aiSend.disabled) return;
+        aiInput.value = '';
+        addAiMsg('user', q);
+        const matches = searchPins(q, 12);
+        aiSend.disabled = true;
+        const typing = addAiMsg('ai', '', null, true);
+        let answer, usedLive = false;
+        try { answer = await askGemini(q, matches); usedLive = true; setAiStatus(true); }
+        catch (err) {
+          setAiStatus(false);
+          let why = 'The AI service is not available right now.';
+          if (err.status === 404) why = 'The AI service is not set up on this page yet (it works once deployed on Vercel with the GEMINI_API_KEY set).';
+          else if (err.status === 429) why = 'Too many requests right now. Wait a minute and try again.';
+          else if (err.status === 500 || err.status === 502) why = 'The AI service is missing or rejected its API key. Check the Vercel settings.';
+          answer = offlineAnswer(q, matches) + `\n\n(${why})`;
+        }
+        typing.remove();
+        aiHistory.push({ role: 'user', text: q }, { role: 'ai', text: answer });
+        addAiMsg('ai', answer, matches.slice(0, usedLive ? 4 : 5));
+        aiSend.disabled = false; aiInput.focus();
+      }
+
+      aiSend.addEventListener('click', () => handleAiSend());
+      aiInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAiSend(); });
+      document.querySelectorAll('.ai-prompt-btn').forEach(b => b.addEventListener('click', () => handleAiSend(b.textContent)));
+      addAiMsg('ai', "Hi! I'm the Paper Atlas AI Navigator. Ask me about biotech jobs, internships, certificates, universities, or summer programs, or tap a suggestion below. Set your starting town on the Home tab and I'll factor in distance.");
+
+      // keep pin-count labels in sync with the data
+      document.querySelectorAll('.pin-total').forEach(el => el.textContent = pinData.length);
+      const catAll = document.querySelector('#categoryFilter option[value="All"]');
+      if (catAll) catAll.textContent = `✨ All Categories (${pinData.length} Pins)`;
+
+
+      // Dark Mode Toggle
+      let isDarkMode = false;
+      const darkToggleBtn = document.getElementById('darkToggleBtn');
+      const darkIcon = document.getElementById('darkIcon');
+      const darkText = document.getElementById('darkText');
+
+      darkToggleBtn.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+          document.body.setAttribute('data-theme', 'dark');
+          darkIcon.innerText = '☀️';
+          darkText.innerText = 'Light';
+        } else {
+          document.body.removeAttribute('data-theme');
+          darkIcon.innerText = '🌙';
+          darkText.innerText = 'Dark';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
